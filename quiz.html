@@ -121,11 +121,9 @@
     }
     .modal-close:hover{background:#e8e8f0}
 
-    /* progress dots */
-    .qdots{display:flex;gap:7px;margin-bottom:24px}
-    .qdot{flex:1;height:6px;border-radius:3px;background:#eee;transition:background .3s}
-    .qdot.done{background:var(--green-dk)}
-    .qdot.cur {background:var(--purple-dk)}
+    /* progress bar (scales to any number of questions) */
+    .qbar{height:8px;border-radius:4px;background:#eee;margin-bottom:22px;overflow:hidden}
+    .qbar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#5c6bc0,#f093fb);transition:width .3s ease}
 
     .q-tag{
       font-family:'Nunito',sans-serif;font-weight:800;font-size:.72em;
@@ -358,55 +356,270 @@ const QUIZZES = [
     icon: "🧬",
     color: "green",
     questions: [
+      // ── Part 1: What DNA is (foundations) ──
       {
-        q: "DNA is made of 4 chemical bases. Which set is correct?",
-        opts: ["A, T, G, C", "A, U, G, C", "A, T, G, P", "A, B, G, C"],
+        q: "What is DNA?",
+        opts: [
+          "The molecule that carries the genetic instructions of all living things",
+          "A type of sugar that bacteria eat",
+          "A protein made in the gut",
+          "A kind of immune cell"
+        ],
         ans: 0,
-        exp: "DNA uses Adenine (A), Thymine (T), Guanine (G), and Cytosine (C). RNA uses Uracil (U) instead of Thymine. This 4-letter alphabet encodes all genetic information."
+        exp: "DNA (deoxyribonucleic acid) stores the genetic 'instruction manual' of every living thing — including every bacterium in your gut. Reading it lets us identify who is present and what they can do."
       },
       {
-        q: "What is a FASTQ file?",
+        q: "DNA is written using an alphabet of just 4 chemical 'letters' (bases). Which set is correct?",
+        opts: ["A, T, G, C", "A, U, G, C", "A, T, G, P", "X, Y, Z, W"],
+        ans: 0,
+        exp: "DNA uses Adenine (A), Thymine (T), Guanine (G) and Cytosine (C). The ORDER of these four letters spells out all genetic information — and that order is what sequencing reads."
+      },
+      {
+        q: "In double-stranded DNA, which bases pair with each other?",
         opts: [
-          "A database of all known bacterial species",
-          "A text file storing DNA sequences plus a quality score for every base",
-          "A compressed gel image",
-          "A MetaPhlAn4 abundance report"
+          "A pairs with G, and T pairs with C",
+          "A pairs with T, and G pairs with C",
+          "A pairs with C, and T pairs with G",
+          "Every base pairs with itself"
         ],
         ans: 1,
-        exp: "FASTQ is the standard format for raw sequencing output. Each read has 4 lines: (1) sequence ID, (2) the DNA sequence, (3) a '+' separator, (4) Phred quality scores — one ASCII character per base."
+        exp: "A always pairs with T, and G always pairs with C. This complementary pairing is what makes DNA a double helix and lets it be copied accurately."
       },
       {
-        q: "A Phred quality score of Q30 means:",
+        q: "RNA is very similar to DNA. What is the key difference in its bases?",
         opts: [
-          "30% accuracy — the base is probably wrong",
-          "1 error in 30 bases",
-          "1 error in 1,000 bases (99.9% accuracy)",
-          "The read is 30 bases long"
+          "RNA uses Uracil (U) instead of Thymine (T)",
+          "RNA has 5 bases",
+          "RNA uses only A and G",
+          "RNA has no bases at all"
         ],
-        ans: 2,
-        exp: "Phred scores are logarithmic: Q30 = 99.9% accuracy (1 error per 1,000 bases). Q20 = 99%, Q40 = 99.99%. In metagenomics QC we typically require bases at Q≥20 before trusting them."
+        ans: 0,
+        exp: "RNA swaps Thymine (T) for Uracil (U). For gut samples we usually sequence DNA, which is far more stable than RNA."
       },
       {
-        q: "Shotgun metagenomics sequences everything at once. What new problem does this create?",
+        q: "What is a gene?",
         opts: [
-          "The sequencer needs to run longer",
-          "We don't know which species each read came from — we need computational tools to classify them",
-          "We need RNA instead of DNA",
-          "Quality scores become less reliable"
-        ],
-        ans: 1,
-        exp: "When sequencing all DNA simultaneously, millions of short reads come from dozens of organisms. Tools like MetaPhlAn4 compare each read to a reference database to classify its source organism — a computational challenge that doesn't exist when sequencing one genome."
-      },
-      {
-        q: "In shotgun metagenomics of a stool sample, which molecule do we actually extract and sequence?",
-        opts: [
-          "Proteins from the bacteria",
-          "All of the DNA in the sample (bacterial + human)",
-          "Only RNA from living bacteria",
+          "A stretch of DNA that codes for something (usually a protein)",
+          "A single base",
+          "A whole bacterium",
           "The mucus layer of the gut"
         ],
+        ans: 0,
+        exp: "A gene is a segment of DNA carrying instructions to build a product, usually a protein. A bacterium's full set of genes (its genome) determines what it can do — e.g. produce butyrate."
+      },
+      {
+        q: "Compared to a human cell, a typical bacterium's DNA is:",
+        opts: [
+          "Much larger and kept inside a nucleus",
+          "Smaller — usually a single circular chromosome, with no nucleus",
+          "Made of protein instead of DNA",
+          "Exactly the same size"
+        ],
         ans: 1,
-        exp: "We extract total DNA from everything in the sample — that includes bacterial DNA AND human DNA shed from gut cells. This is exactly why the first pipeline step (KneadData) has to remove the human DNA before we analyse the bacteria."
+        exp: "Bacteria are simpler: most carry one circular chromosome and have no nucleus. Their small genomes make it practical to sequence many species at once."
+      },
+      // ── Part 2: Why we sequence ──
+      {
+        q: "What does 'DNA sequencing' actually mean?",
+        opts: [
+          "Growing bacteria in order of size",
+          "Reading the exact order of the bases (A, T, G, C) in a piece of DNA",
+          "Counting cells under a microscope",
+          "Weighing a sample"
+        ],
+        ans: 1,
+        exp: "Sequencing = determining the precise order of A, T, G, C along a DNA molecule. That letter-by-letter readout is the raw data the whole pipeline is built on."
+      },
+      {
+        q: "Why do we SEQUENCE the DNA in a gut sample instead of just growing the bacteria in a dish?",
+        opts: [
+          "Sequencing is cheaper than buying petri dishes",
+          "Most gut bacteria can't be grown in the lab, but their DNA can still be read",
+          "Bacteria become harmless once sequenced",
+          "Growing bacteria destroys their DNA"
+        ],
+        ans: 1,
+        exp: "Most gut bacteria are anaerobes that are very hard or impossible to culture. Sequencing reads their DNA directly, so we can detect thousands of species — including many nobody has ever grown."
+      },
+      {
+        q: "Why can't we simply look at a gut sample under a microscope to identify the species?",
+        opts: [
+          "Microscopes are too expensive",
+          "Most bacteria look alike under a microscope — you can't tell species apart by shape",
+          "Bacteria are invisible to every microscope",
+          "The gut contains no bacteria to see"
+        ],
+        ans: 1,
+        exp: "Many bacteria are plain rods or spheres and look nearly identical. Their DNA sequence, not their shape, distinguishes them — which is exactly why we sequence."
+      },
+      {
+        q: "'Culture bias' in microbiome research is the problem that:",
+        opts: [
+          "Lab dishes only grow the minority of species that like lab conditions, giving a distorted picture",
+          "Bacteria prefer certain kinds of music",
+          "Sequencing favours large bacteria",
+          "Only viruses can be cultured"
+        ],
+        ans: 0,
+        exp: "If you study only what grows in a dish, you see a small, biased slice of the community. Sequencing avoids this by reading DNA from everything present, cultured or not."
+      },
+      {
+        q: "By sequencing the DNA in a stool sample, what can we learn?",
+        opts: [
+          "Only the person's blood type",
+          "Which microbial species are present AND what genes/functions they carry",
+          "The temperature of the gut",
+          "Nothing useful"
+        ],
+        ans: 1,
+        exp: "Sequencing reveals both WHO is there (taxonomy) and WHAT they can do (their genes and metabolic capacity) — both central to our food-allergy research."
+      },
+      // ── Part 3: How sequencing works ──
+      {
+        q: "Our lab uses Illumina sequencing. What does it produce?",
+        opts: [
+          "A few very long reads",
+          "Huge numbers of short, highly accurate reads",
+          "Only images",
+          "Live bacteria"
+        ],
+        ans: 1,
+        exp: "Illumina is a 'short-read' technology: it generates millions of short (~100–150 base) but very accurate reads per run — ideal for profiling complex communities."
+      },
+      {
+        q: "In sequencing, what is a 'read'?",
+        opts: [
+          "A single short stretch of sequenced DNA, output by the machine",
+          "A scientific paper",
+          "One whole bacterial genome",
+          "A quality score"
+        ],
+        ans: 0,
+        exp: "A read is one continuous string of bases the sequencer produced from a single DNA fragment. Metagenomics classifies and assembles millions of these reads."
+      },
+      {
+        q: "'Paired-end' sequencing means the machine reads each DNA fragment:",
+        opts: [
+          "Twice — from both ends",
+          "Only from the middle",
+          "Backwards only",
+          "Once, very slowly"
+        ],
+        ans: 0,
+        exp: "Paired-end sequencing reads a fragment from both ends (called R1 and R2). Knowing both ends and the gap between them makes read alignment more accurate."
+      },
+      {
+        q: "'Sequencing depth' (how many reads you get per sample) matters because:",
+        opts: [
+          "Deeper sequencing detects rarer species that shallow sequencing would miss",
+          "Depth changes the bacteria's DNA",
+          "Shallow sequencing is always better",
+          "Depth only affects the file's colour"
+        ],
+        ans: 0,
+        exp: "More reads = more chances to catch low-abundance organisms. Sequence too shallowly and rare-but-important species can go undetected."
+      },
+      // ── Part 4: FASTQ & quality (the format summary) ──
+      {
+        q: "After a sequencing run, the raw data comes out in which file format?",
+        opts: ["FASTQ", "PDF", "JPEG", "PowerPoint"],
+        ans: 0,
+        exp: "Raw sequencing output is stored as FASTQ files — the starting point for the entire bioinformatics pipeline."
+      },
+      {
+        q: "What does a FASTQ file store for each read?",
+        opts: [
+          "Only the DNA sequence",
+          "The DNA sequence PLUS a quality score for every single base",
+          "A photograph of the DNA",
+          "The bacterium's name"
+        ],
+        ans: 1,
+        exp: "FASTQ = the letters (the sequence) PLUS how confident the machine is about each letter (quality). That extra quality info is what separates FASTQ from a plain sequence file (FASTA)."
+      },
+      {
+        q: "Each read in a FASTQ file is stored as how many lines?",
+        opts: ["1 line", "2 lines", "4 lines", "10 lines"],
+        ans: 2,
+        exp: "Exactly 4 lines per read: (1) an '@' ID line, (2) the sequence, (3) a '+' separator, (4) the quality string."
+      },
+      {
+        q: "In a FASTQ record, what does the 4th line contain?",
+        opts: [
+          "The DNA sequence again",
+          "A quality score character for each base",
+          "The date of sequencing",
+          "The species name"
+        ],
+        ans: 1,
+        exp: "Line 4 holds one quality character per base, lined up with the sequence on line 2 — so every single base gets its own confidence score."
+      },
+      {
+        q: "What does a Phred quality score tell you about a base?",
+        opts: [
+          "How long the read is",
+          "How confident the machine is that the base was called correctly",
+          "Which species the read is from",
+          "The GC content"
+        ],
+        ans: 1,
+        exp: "Phred scores measure the probability that a base call is wrong. Higher = more reliable. They let us trim or discard untrustworthy bases before analysis."
+      },
+      {
+        q: "A Phred score of Q30 means the base is correct with about:",
+        opts: [
+          "30% confidence",
+          "90% confidence",
+          "99.9% confidence (1 error in 1,000 bases)",
+          "50% confidence"
+        ],
+        ans: 2,
+        exp: "Phred is logarithmic: Q30 = 99.9% accuracy (1 wrong base in 1,000), Q20 = 99% (1 in 100), Q40 = 99.99%. We usually trust bases at Q20 or higher."
+      },
+      {
+        q: "Why do we check quality scores and trim low-quality bases before analysis?",
+        opts: [
+          "To make the files bigger",
+          "Because wrong bases can cause wrong species identifications and false results",
+          "Quality scores are just decoration",
+          "To slow the computer down"
+        ],
+        ans: 1,
+        exp: "Garbage in, garbage out: low-quality bases lead to misidentified reads and unreliable conclusions. Quality control (QC) removes them so the results downstream can be trusted."
+      },
+      // ── Part 5: From reads to metagenomics (bridge to the pipeline) ──
+      {
+        q: "'Shotgun' metagenomics means:",
+        opts: [
+          "Sequencing one gene from one bacterium",
+          "Randomly sequencing ALL the DNA in a sample at once",
+          "Using an actual shotgun",
+          "Only sequencing viruses"
+        ],
+        ans: 1,
+        exp: "Shotgun sequencing chops up and reads all the DNA present, from every organism, simultaneously — giving a comprehensive view of the whole community."
+      },
+      {
+        q: "Because shotgun sequencing mixes reads from many species, the big computational challenge is:",
+        opts: [
+          "Making the files colourful",
+          "Working out which read came from which organism",
+          "Choosing what font to use",
+          "Growing the bacteria afterwards"
+        ],
+        ans: 1,
+        exp: "Millions of reads arrive jumbled together. Tools like MetaPhlAn4 compare each read to reference databases to assign it to the right organism — a problem that doesn't exist when sequencing a single pure genome."
+      },
+      {
+        q: "A stool sample's DNA also contains human DNA. What must the pipeline do about it?",
+        opts: [
+          "Nothing — human DNA helps",
+          "Remove the human reads first (with KneadData) before studying the bacteria",
+          "Sequence only the human DNA",
+          "Add even more human DNA"
+        ],
+        ans: 1,
+        exp: "Gut samples contain human DNA from shed gut cells. The first pipeline step (KneadData) filters out those human reads so they don't contaminate the microbial analysis — this is where DNA & Sequencing connects to next week's pipeline."
       }
     ]
   },
@@ -584,7 +797,7 @@ function renderQ() {
   const q = quiz.questions[cur]
   document.getElementById('modal-body').innerHTML = `
     <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1em;margin-bottom:10px">${quiz.icon} ${quiz.title}</div>
-    <div class="qdots">${quiz.questions.map((_,i)=>`<div class="qdot ${i<cur?'done':i===cur?'cur':''}"></div>`).join('')}</div>
+    <div class="qbar"><div class="qbar-fill" style="width:${Math.round(cur*100/quiz.questions.length)}%"></div></div>
     <div class="q-tag">Question ${cur+1} of ${quiz.questions.length}</div>
     <div class="q-text">${q.q}</div>
     <div class="opts">${q.opts.map((o,i)=>`<button class="opt" id="o${i}" onclick="pick(${i})">${o}</button>`).join('')}</div>

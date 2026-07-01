@@ -378,13 +378,14 @@ const DATA = {
           ],
           tasks:[
             {type:"watch",   label:"TED-Ed: What is DNA? (~5 min)", url:"https://www.youtube.com/results?search_query=TED-Ed+what+is+DNA+and+how+does+it+work"},
-            {type:"watch",   label:"Illumina sequencing by synthesis (~5 min)", url:"https://www.youtube.com/results?search_query=Illumina+sequencing+by+synthesis"},
-            {type:"read",    label:"Quick reference: FASTQ format (4 lines) and Phred scores (Q20 = 99%, Q30 = 99.9%)"},
+            {type:"read",    label:"WHY do we sequence? We can't grow most gut bacteria in a dish — sequencing reads their DNA directly to identify thousands of species at once (avoids 'culture bias')"},
+            {type:"watch",   label:"Illumina sequencing by synthesis (~5 min) — how DNA becomes millions of short 'reads'", url:"https://www.youtube.com/results?search_query=Illumina+sequencing+by+synthesis"},
+            {type:"read",    label:"FASTQ in a nutshell: every read = 4 lines → (1) @ID, (2) the sequence, (3) '+', (4) a quality score per base. Phred: Q20 = 99% accurate, Q30 = 99.9%"},
             {type:"practice",label:"Open an example .fastq file — find one read, identify all 4 lines and explain each"},
             {type:"write",   label:"Lab notebook: draw a DNA strand and label the 4 bases (A, T, G, C)"},
             {type:"think",   label:"Why do we need a quality score for every single base? What could go wrong without it?"}
           ],
-          mission:"Explain in your own words what is inside a FASTQ file, and what a Q30 quality score means."
+          mission:"Explain in your own words: (1) why we sequence instead of growing bacteria, and (2) what is inside a FASTQ file including what Q30 means."
         },
         {
           id:4, color:"orange",
@@ -433,7 +434,7 @@ const DATA = {
   quizTopics:[
     {id:"gut-basics", title:"Gut Microbiome Basics", icon:"🦠", color:"coral",  questions:5},
     {id:"bacteria",   title:"Key Bacteria",           icon:"🔬", color:"purple", questions:5},
-    {id:"dna",        title:"DNA & Sequencing",       icon:"🧬", color:"green",  questions:5},
+    {id:"dna",        title:"DNA & Sequencing",       icon:"🧬", color:"green",  questions:25},
     {id:"pipeline",   title:"Metagenomics Pipeline",  icon:"⚙️", color:"orange", questions:5},
     {id:"open",       title:"Open Questions",         icon:"🧠", color:"gold",   questions:5, open:true}
   ],
