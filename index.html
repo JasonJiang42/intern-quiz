@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🧫 Microbiome Quiz Hub</title>
+  <title>🧫 Internship Hub</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -13,547 +13,668 @@
       --green:#b5ead7;  --green-dk:#27ae60;
       --gold:#ffe066;   --gold-dk:#b8860b;
       --dark:#2d2d4e;   --gray:#7c83a0;
+      --bg:linear-gradient(135deg,#e0f7fa 0%,#e8eaf6 55%,#fce4ec 100%);
     }
     *{box-sizing:border-box;margin:0;padding:0}
-    body{
-      font-family:'Nunito Sans',sans-serif;
-      min-height:100vh;color:var(--dark);
-      background:linear-gradient(135deg,#e0f7fa 0%,#e8eaf6 55%,#fce4ec 100%);
-    }
+    body{font-family:'Nunito Sans',sans-serif;background:var(--bg);min-height:100vh;color:var(--dark)}
 
-    /* ── Blobs ── */
-    .blob{position:fixed;border-radius:50%;filter:blur(72px);opacity:.22;pointer-events:none;z-index:0;animation:drift 8s ease-in-out infinite alternate}
-    .b1{width:460px;height:460px;background:#ff9aa2;top:-130px;right:-100px;animation-delay:0s}
-    .b2{width:380px;height:380px;background:#c7ceea;bottom:20px;left:-100px;animation-delay:-3s}
-    .b3{width:300px;height:300px;background:#b5ead7;top:40%;left:38%;animation-delay:-5s}
-    @keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(18px,22px) scale(1.06)}}
+    /* blobs */
+    .blob{position:fixed;border-radius:50%;filter:blur(70px);opacity:.18;pointer-events:none;z-index:0;animation:drift 9s ease-in-out infinite alternate}
+    .b1{width:440px;height:440px;background:#ff9aa2;top:-120px;right:-90px}
+    .b2{width:370px;height:370px;background:#c7ceea;bottom:10px;left:-90px;animation-delay:-4s}
+    .b3{width:290px;height:290px;background:#b5ead7;top:42%;left:40%;animation-delay:-7s}
+    @keyframes drift{from{transform:translate(0,0)}to{transform:translate(20px,24px)}}
 
-    /* ── Page ── */
-    .page{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:48px 24px 80px}
+    /* topbar */
+    .topbar{
+      position:fixed;top:0;left:0;right:0;z-index:200;height:60px;
+      background:rgba(255,255,255,.93);backdrop-filter:blur(14px);
+      border-bottom:1px solid rgba(0,0,0,.06);
+      display:flex;align-items:center;padding:0 24px;gap:4px;
+    }
+    .logo{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05em;margin-right:16px;white-space:nowrap;flex-shrink:0}
+    .logo span{color:var(--purple-dk)}
+    .nav-btn{
+      display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:50px;
+      border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:.82em;
+      background:transparent;color:var(--gray);transition:all .15s;white-space:nowrap;
+    }
+    .nav-btn:hover{background:#f0f0f8;color:var(--dark)}
+    .nav-btn.active{background:var(--dark);color:white}
+    .topbar-right{margin-left:auto;font-size:.8em;color:var(--gray);white-space:nowrap;flex-shrink:0}
 
-    /* ── Header ── */
-    .hero{text-align:center;margin-bottom:48px}
-    .hero-badge{
-      display:inline-block;background:white;border-radius:50px;
-      padding:8px 22px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.82em;
-      color:var(--purple-dk);box-shadow:0 4px 18px rgba(92,107,192,.18);margin-bottom:20px;
-      letter-spacing:.5px;
-    }
-    .hero h1{
-      font-family:'Nunito',sans-serif;font-weight:900;font-size:2.4em;line-height:1.2;
-      margin-bottom:12px;
-    }
-    .grad{
-      background:linear-gradient(135deg,#5c6bc0,#f093fb);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-    }
-    .hero p{color:var(--gray);font-size:.95em;line-height:1.7;max-width:480px;margin:0 auto 24px}
+    /* layout */
+    .main{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:80px 22px 70px}
+    .section{display:none}.section.active{display:block}
+    .pg-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.6em;margin-bottom:4px}
+    .pg-sub{color:var(--gray);font-size:.87em;margin-bottom:26px;line-height:1.5}
 
-    /* progress strip */
-    .progress-strip{
-      display:inline-flex;align-items:center;gap:8px;
-      background:white;border-radius:50px;padding:10px 22px;
-      box-shadow:0 4px 18px rgba(0,0,0,.08);font-size:.84em;
-    }
-    .progress-strip .ps-num{font-family:'Nunito',sans-serif;font-weight:900;color:var(--purple-dk);font-size:1.1em}
-
-    /* ── Quiz grid ── */
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px;margin-bottom:40px}
-
-    .qcard{
-      background:white;border-radius:24px;padding:28px 18px 22px;
-      text-align:center;cursor:pointer;position:relative;overflow:hidden;
-      box-shadow:0 4px 20px rgba(0,0,0,.07);
-      transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;
-    }
-    .qcard::before{content:'';position:absolute;top:0;left:0;right:0;height:5px}
-    .qcard:hover{transform:translateY(-6px) rotate(.4deg);box-shadow:0 14px 38px rgba(0,0,0,.13)}
+    /* cards */
+    .card{background:white;border-radius:22px;padding:24px 28px;box-shadow:0 4px 22px rgba(0,0,0,.07);position:relative;overflow:hidden;margin-bottom:14px}
+    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:6px}
     .c-coral::before  {background:linear-gradient(90deg,#ff9aa2,#ff6b81)}
     .c-purple::before {background:linear-gradient(90deg,#c7ceea,#5c6bc0)}
     .c-orange::before {background:linear-gradient(90deg,#ffdac1,#e67e22)}
     .c-green::before  {background:linear-gradient(90deg,#b5ead7,#27ae60)}
     .c-gold::before   {background:linear-gradient(90deg,#ffe066,#ffd700)}
 
-    .qcard-icon{font-size:2.8em;margin-bottom:12px;display:block;animation:bob 3s ease-in-out infinite}
-    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-    .qcard:nth-child(2) .qcard-icon{animation-delay:-.8s}
-    .qcard:nth-child(3) .qcard-icon{animation-delay:-1.6s}
-    .qcard:nth-child(4) .qcard-icon{animation-delay:-2.2s}
+    /* pills */
+    .pill{display:inline-block;padding:3px 11px;border-radius:50px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.72em;margin:2px}
+    .p-coral{background:#fff0f0;color:var(--coral-dk)} .p-purple{background:#eef0ff;color:var(--purple-dk)}
+    .p-green{background:#edfff5;color:var(--green-dk)} .p-gold{background:#fffbe6;color:var(--gold-dk)}
+    .p-orange{background:#fff3e6;color:var(--orange-dk)}
 
-    .qcard-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:.95em;margin-bottom:6px}
-    .qcard-count{font-size:.76em;color:var(--gray);margin-bottom:10px}
-    .qcard-badge{
-      display:inline-block;padding:4px 13px;border-radius:50px;
-      font-family:'Nunito',sans-serif;font-weight:800;font-size:.72em;
+    /* ── HOME ── */
+    .home-hero{text-align:center;padding:20px 0 32px}
+    .home-emoji{font-size:3.5em;margin-bottom:14px;display:block;animation:bob 3s ease-in-out infinite}
+    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .home-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:2em;margin-bottom:8px;line-height:1.2}
+    .grad{background:linear-gradient(135deg,#5c6bc0,#f093fb);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .home-sub{color:var(--gray);font-size:.9em;line-height:1.7;max-width:480px;margin:0 auto}
+    .week-overview{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:28px 0}
+    .wk-card{background:white;border-radius:18px;padding:18px 14px;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,.07);position:relative;overflow:hidden}
+    .wk-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px}
+    .wk-card.wk1::before{background:linear-gradient(90deg,#ff9aa2,#ff6b81)}
+    .wk-card.wk2::before{background:linear-gradient(90deg,#c7ceea,#5c6bc0)}
+    .wk-card.wk3::before{background:linear-gradient(90deg,#b5ead7,#27ae60)}
+    .wk-card.locked{opacity:.55}
+    .wk-label{font-family:'Nunito',sans-serif;font-weight:900;font-size:.85em;margin-bottom:4px}
+    .wk-desc{font-size:.75em;color:var(--gray);line-height:1.5}
+    .nav-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:4px}
+    .nav-tile{
+      background:white;border-radius:18px;padding:18px 16px;
+      box-shadow:0 4px 18px rgba(0,0,0,.07);cursor:pointer;
+      transition:transform .15s,box-shadow .15s;text-align:center;border:none;width:100%;
     }
-    .score-great{background:#edfff5;color:var(--green-dk)}
-    .score-ok   {background:#fffbe6;color:var(--gold-dk)}
-    .score-low  {background:#fff0f0;color:var(--coral-dk)}
-    .score-new  {background:#eef0ff;color:var(--purple-dk)}
+    .nav-tile:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.12)}
+    .nt-icon{font-size:2em;margin-bottom:8px;display:block}
+    .nt-label{font-family:'Nunito',sans-serif;font-weight:800;font-size:.9em;margin-bottom:3px}
+    .nt-desc{font-size:.75em;color:var(--gray)}
 
-    /* ── Info banner ── */
-    .info-banner{
-      background:white;border-radius:20px;padding:20px 26px;
-      box-shadow:0 4px 18px rgba(0,0,0,.06);
-      display:flex;align-items:flex-start;gap:16px;font-size:.86em;line-height:1.65;color:#666;
+    /* ── DAILY WORK ── */
+    .week-tabs{display:flex;gap:9px;margin-bottom:20px;flex-wrap:wrap}
+    .wtab{
+      padding:8px 20px;border-radius:50px;border:2px solid #e8eaf6;
+      font-family:'Nunito',sans-serif;font-weight:800;font-size:.82em;
+      cursor:pointer;background:white;color:var(--gray);transition:all .15s;line-height:1.4;text-align:center;
     }
-    .info-banner .ib-icon{font-size:1.8em;flex-shrink:0;margin-top:2px}
+    .wtab.active{border-color:var(--purple-dk);color:var(--purple-dk);background:#eef0ff}
+    .wtab.locked{opacity:.5;cursor:not-allowed}
 
-    /* ── Modal ── */
-    .overlay{
-      display:none;position:fixed;inset:0;z-index:400;
-      background:rgba(45,45,78,.5);backdrop-filter:blur(5px);
-      align-items:center;justify-content:center;padding:16px;
+    .day-card{
+      background:white;border-radius:18px;padding:16px 20px;
+      box-shadow:0 4px 16px rgba(0,0,0,.06);margin-bottom:6px;
+      position:relative;overflow:hidden;cursor:pointer;
+      transition:transform .15s,box-shadow .15s;
     }
-    .overlay.open{display:flex}
-    .modal{
-      background:white;border-radius:28px;width:660px;max-width:100%;
-      max-height:92vh;overflow-y:auto;padding:36px 40px;
-      box-shadow:0 28px 90px rgba(0,0,0,.22);position:relative;
-      animation:popIn .25s cubic-bezier(.34,1.56,.64,1);
+    .day-card:hover{transform:translateY(-2px);box-shadow:0 7px 24px rgba(0,0,0,.10)}
+    .day-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;border-radius:0 3px 3px 0}
+    .day-card.c-coral::before {background:linear-gradient(180deg,#ff9aa2,#ff6b81)}
+    .day-card.c-purple::before{background:linear-gradient(180deg,#c7ceea,#5c6bc0)}
+    .day-card.c-orange::before{background:linear-gradient(180deg,#ffdac1,#e67e22)}
+    .day-card.c-green::before {background:linear-gradient(180deg,#b5ead7,#27ae60)}
+    .day-card.c-gold::before  {background:linear-gradient(180deg,#ffe066,#ffd700)}
+    .day-card.is-open .day-arrow{transform:rotate(90deg)}
+
+    .day-hdr{display:flex;align-items:center;gap:10px}
+    .day-num{font-family:'Nunito',sans-serif;font-weight:900;font-size:.68em;padding:3px 10px;border-radius:50px;background:#f0f0ff;color:var(--purple-dk);flex-shrink:0}
+    .day-title-txt{font-family:'Nunito',sans-serif;font-weight:800;font-size:.94em;flex:1}
+    .day-meta{font-size:.74em;color:var(--gray);flex-shrink:0}
+    .day-arrow{flex-shrink:0;color:#ccc;font-size:.8em;transition:transform .2s}
+
+    .day-detail{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s}
+    .day-detail.open{max-height:4000px;padding-top:16px}
+    .sec-lbl{font-family:'Nunito',sans-serif;font-weight:800;font-size:.7em;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin:14px 0 7px}
+    .obj-list{list-style:none;padding:0;margin:0}
+    .obj-list li{font-size:.83em;padding:3px 0 3px 15px;position:relative;color:#555;line-height:1.5}
+    .obj-list li::before{content:'▸';position:absolute;left:0;color:#ccc}
+
+    .task-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5}
+    .task-row:last-child{border:none}
+    .t-icon{font-size:1.05em;flex-shrink:0;margin-top:1px}
+    .t-label{font-size:.83em;flex:1;line-height:1.5}
+    .t-label a{color:var(--purple-dk);text-decoration:none}
+    .t-label a:hover{text-decoration:underline}
+    .t-check{width:21px;height:21px;border-radius:50%;border:2px solid #ddd;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:1px}
+    .t-check.done{background:var(--green-dk);border-color:var(--green-dk);color:white}
+    .t-check.done::after{content:'✓';font-size:.7em;font-weight:900}
+
+    .mission-box{background:linear-gradient(135deg,#eef0ff,#e8f5ff);border-radius:13px;padding:13px 17px;margin-top:14px;border-left:4px solid var(--purple-dk)}
+    .mission-lbl{font-family:'Nunito',sans-serif;font-weight:800;font-size:.7em;letter-spacing:1.5px;text-transform:uppercase;color:var(--purple-dk);margin-bottom:5px}
+    .btn-complete{margin-top:13px;padding:8px 20px;border-radius:50px;border:none;background:var(--green-dk);color:white;font-family:'Nunito',sans-serif;font-weight:800;font-size:.8em;cursor:pointer}
+    .btn-complete:hover{opacity:.85}
+
+    /* ── QUIZZES ── */
+    .quiz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:20px}
+    .qz-card{
+      background:white;border-radius:20px;padding:24px 16px 18px;text-align:center;
+      box-shadow:0 4px 18px rgba(0,0,0,.07);cursor:pointer;position:relative;overflow:hidden;
+      transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;text-decoration:none;display:block;
     }
-    @keyframes popIn{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
-    .modal-close{
-      position:absolute;top:18px;right:20px;
-      width:36px;height:36px;border-radius:50%;background:#f4f4f8;
-      border:none;cursor:pointer;font-size:1em;display:flex;align-items:center;justify-content:center;
-      transition:background .15s;
-    }
-    .modal-close:hover{background:#e8e8f0}
+    .qz-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px}
+    .qz-card.c-coral::before {background:linear-gradient(90deg,#ff9aa2,#ff6b81)}
+    .qz-card.c-purple::before{background:linear-gradient(90deg,#c7ceea,#5c6bc0)}
+    .qz-card.c-green::before {background:linear-gradient(90deg,#b5ead7,#27ae60)}
+    .qz-card.c-orange::before{background:linear-gradient(90deg,#ffdac1,#e67e22)}
+    .qz-card:hover{transform:translateY(-5px) rotate(.3deg);box-shadow:0 12px 32px rgba(0,0,0,.12)}
+    .qz-icon{font-size:2.4em;margin-bottom:10px;display:block;animation:bob 3s ease-in-out infinite}
+    .qz-card:nth-child(2) .qz-icon{animation-delay:-.9s}
+    .qz-card:nth-child(3) .qz-icon{animation-delay:-1.7s}
+    .qz-card:nth-child(4) .qz-icon{animation-delay:-2.4s}
+    .qz-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:.92em;margin-bottom:5px;color:var(--dark)}
+    .qz-count{font-size:.74em;color:var(--gray);margin-bottom:10px}
+    .qz-badge{display:inline-block;padding:3px 11px;border-radius:50px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.7em}
+    .b-new  {background:#eef0ff;color:var(--purple-dk)}
+    .b-great{background:#edfff5;color:var(--green-dk)}
+    .b-ok   {background:#fffbe6;color:var(--gold-dk)}
+    .b-low  {background:#fff0f0;color:var(--coral-dk)}
 
-    /* progress dots */
-    .qdots{display:flex;gap:7px;margin-bottom:24px}
-    .qdot{flex:1;height:6px;border-radius:3px;background:#eee;transition:background .3s}
-    .qdot.done{background:var(--green-dk)}
-    .qdot.cur {background:var(--purple-dk)}
+    /* ── QUESTIONS ── */
+    .qa-submit-box{background:white;border-radius:20px;padding:22px 26px;box-shadow:0 4px 18px rgba(0,0,0,.07);margin-bottom:22px}
+    .qa-textarea{width:100%;padding:12px 15px;border-radius:13px;border:2px solid #e8eaf6;font-family:'Nunito Sans',sans-serif;font-size:.87em;resize:none;margin:10px 0;transition:border-color .15s}
+    .qa-textarea:focus{outline:none;border-color:var(--purple-dk)}
+    .btn-ask{padding:10px 24px;border-radius:50px;border:none;background:var(--purple-dk);color:white;font-family:'Nunito',sans-serif;font-weight:800;font-size:.85em;cursor:pointer}
+    .btn-ask:hover{opacity:.85}
 
-    .q-tag{
-      font-family:'Nunito',sans-serif;font-weight:800;font-size:.72em;
-      text-transform:uppercase;letter-spacing:1.5px;color:var(--gray);margin-bottom:10px;
-    }
-    .q-text{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1em;line-height:1.55;margin-bottom:22px}
+    .qa-item{background:white;border-radius:20px;padding:20px 24px;box-shadow:0 4px 18px rgba(0,0,0,.07);margin-bottom:12px}
+    .qa-row{display:flex;gap:10px}
+    .qa-av{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:.7em}
+    .av-s{background:#eef0ff;color:var(--purple-dk)}
+    .av-m{background:#edfff5;color:var(--green-dk)}
+    .qa-bubble{flex:1;border-radius:0 13px 13px 13px;padding:10px 14px;font-size:.85em;line-height:1.6;background:#f8f9ff}
+    .qa-bubble.mentor{background:#edfff5;border-radius:13px 13px 13px 0}
+    .qa-date{font-size:.69em;color:var(--gray);margin-top:4px;padding-left:40px}
+    .qa-pending{background:#fffbe6;border-radius:10px;padding:7px 13px;font-size:.77em;color:var(--gold-dk);margin-top:8px}
 
-    .opts{display:flex;flex-direction:column;gap:10px}
-    .opt{
-      padding:13px 18px;border-radius:14px;border:2px solid #eaeaf5;
-      cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:.88em;
-      text-align:left;background:white;transition:all .15s;
-    }
-    .opt:hover:not([disabled]){border-color:var(--purple-dk);background:#eef0ff;transform:translateX(4px)}
-    .opt.correct{background:#edfff5;border-color:var(--green-dk);color:var(--green-dk)}
-    .opt.wrong  {background:#fff0f0;border-color:var(--coral-dk);color:var(--coral-dk)}
-    .opt.reveal {background:#edfff5;border-color:var(--green-dk)}
+    /* ── SUGGESTIONS ── */
+    .sug-section{margin-bottom:28px}
+    .sug-heading{font-family:'Nunito',sans-serif;font-weight:900;font-size:1em;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .sug-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+    .sug-card{background:white;border-radius:16px;padding:16px 18px;box-shadow:0 3px 14px rgba(0,0,0,.06);position:relative;overflow:hidden}
+    .sug-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px}
+    .sug-card.s-coral::before {background:#ff9aa2} .sug-card.s-purple::before{background:#5c6bc0}
+    .sug-card.s-green::before {background:#27ae60} .sug-card.s-gold::before  {background:#ffd700}
+    .sug-card.s-orange::before{background:#e67e22}
+    .sug-title{font-family:'Nunito',sans-serif;font-weight:800;font-size:.87em;margin-bottom:4px}
+    .sug-author{font-size:.74em;color:var(--gray);margin-bottom:6px}
+    .sug-desc{font-size:.79em;color:#666;line-height:1.55}
+    .sug-link{display:inline-block;margin-top:8px;font-size:.75em;color:var(--purple-dk);font-weight:700;text-decoration:none}
+    .sug-link:hover{text-decoration:underline}
 
-    .expl{
-      background:#f8f9ff;border-radius:14px;padding:14px 18px;
-      margin-top:16px;font-size:.84em;line-height:1.68;display:none;
-      border-left:4px solid var(--purple-dk);
-    }
-    .expl.show{display:block;animation:fadeSlide .2s ease}
-    @keyframes fadeSlide{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-    .btn-next{
-      margin-top:20px;padding:12px 30px;border-radius:50px;
-      background:var(--dark);color:white;border:none;
-      font-family:'Nunito',sans-serif;font-weight:800;font-size:.9em;
-      cursor:pointer;display:none;transition:opacity .15s;
-    }
-    .btn-next.show{display:inline-block}
-    .btn-next:hover{opacity:.85}
-
-    /* result */
-    .result{text-align:center;padding:20px 0}
-    .result-emoji{font-size:4.5em;margin-bottom:16px;display:block;animation:bounce .6s ease}
-    @keyframes bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-14px)}}
-    .result-score{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.2em;color:var(--dark)}
-    .result-pct{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.6em;color:var(--purple-dk);margin-top:4px}
-    .result-msg{color:var(--gray);font-size:.92em;margin:12px 0 28px;line-height:1.6;max-width:360px;margin-left:auto;margin-right:auto}
-    .result-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-    .btn-retry{padding:11px 26px;border-radius:50px;border:2px solid var(--dark);background:white;color:var(--dark);font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer}
-    .btn-done {padding:11px 26px;border-radius:50px;border:none;background:var(--dark);color:white;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer}
-
-    /* stars */
-    .stars{display:flex;justify-content:center;gap:4px;margin:14px 0 6px;font-size:1.8em}
-
-    /* all-done banner */
-    .all-done{
-      background:white;border-radius:24px;padding:32px;text-align:center;
-      box-shadow:0 8px 40px rgba(92,107,192,.15);margin-top:10px;
-      border:2px dashed #c7ceea;display:none;
-    }
-    .all-done.show{display:block;animation:fadeSlide .3s ease}
-    .all-done .ad-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.2em;margin-bottom:8px}
-    .all-done .ad-sub{color:var(--gray);font-size:.88em;line-height:1.6}
-
-    @media(max-width:560px){
-      .hero h1{font-size:1.75em}
-      .page{padding:36px 16px 60px}
-      .modal{padding:24px 18px}
-      .grid{grid-template-columns:1fr 1fr}
+    @media(max-width:580px){
+      .main{padding:72px 14px 50px}
+      .week-overview,.nav-grid{grid-template-columns:1fr}
+      .quiz-grid{grid-template-columns:1fr 1fr}
+      .topbar{padding:0 12px}
+      .nav-btn span.nav-label{display:none}
     }
   </style>
 </head>
 <body>
+<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
 
-<div class="blob b1"></div>
-<div class="blob b2"></div>
-<div class="blob b3"></div>
+<nav class="topbar">
+  <div class="logo">🧫 Intern<span>Hub</span></div>
+  <button class="nav-btn active" onclick="show('home',this)">🏠 <span class="nav-label">Home</span></button>
+  <button class="nav-btn" onclick="show('daily',this)">📚 <span class="nav-label">Daily Work</span></button>
+  <button class="nav-btn" onclick="show('quiz',this)">🎯 <span class="nav-label">Quizzes</span></button>
+  <button class="nav-btn" onclick="show('qa',this)">💬 <span class="nav-label">Questions</span></button>
+  <button class="nav-btn" onclick="show('sug',this)">💡 <span class="nav-label">Suggestions</span></button>
+  <div class="topbar-right" id="greeting"></div>
+</nav>
 
-<div class="page">
+<main class="main">
 
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-badge">🧫 Gut Microbiome Internship 2026</div>
-    <h1>Quiz <span class="grad">Hub</span> 🎯</h1>
-    <p>Test yourself on what you've learned. Each quiz gives you instant feedback and an explanation — retake as many times as you like!</p>
-    <div class="progress-strip" id="progress-strip">
-      <span>🏆</span>
-      <span id="ps-text">Loading scores...</span>
+<!-- ═══ HOME ═══ -->
+<section class="section active" id="sec-home">
+  <div class="home-hero">
+    <span class="home-emoji">🧫</span>
+    <div class="home-title">Welcome, <span class="grad" id="hero-name">Intern</span>!</div>
+    <p class="home-sub">Everything you need for your 3-week gut microbiome internship is right here. Check your daily tasks, test yourself on quizzes, and ask your mentor anything.</p>
+  </div>
+
+  <div class="week-overview">
+    <div class="wk-card wk1">
+      <div class="wk-label">Week 1 🌟</div>
+      <div class="wk-desc">Foundations<br>Gut microbiome, immunity, DNA &amp; Linux</div>
+    </div>
+    <div class="wk-card wk2 locked">
+      <div class="wk-label">Week 2 🔬</div>
+      <div class="wk-desc">Bioinformatics<br>KneadData → MetaPhlAn4 → HUMAnN3</div>
+    </div>
+    <div class="wk-card wk3 locked">
+      <div class="wk-label">Week 3 📊</div>
+      <div class="wk-desc">Analysis<br>Diversity, MaAsLin2 &amp; your results</div>
     </div>
   </div>
 
-  <!-- Quiz cards -->
-  <div class="grid" id="grid"></div>
-
-  <!-- All-done banner -->
-  <div class="all-done" id="all-done">
-    <div style="font-size:2.5em;margin-bottom:10px">🎉</div>
-    <div class="ad-title">You've completed all quizzes!</div>
-    <div class="ad-sub">Amazing work. Keep revisiting to reinforce your knowledge.<br>More quizzes will unlock as the internship progresses.</div>
+  <div class="nav-grid">
+    <button class="nav-tile" onclick="show('daily',document.querySelectorAll('.nav-btn')[1])">
+      <span class="nt-icon">📚</span>
+      <div class="nt-label">Daily Work</div>
+      <div class="nt-desc">Your tasks for today</div>
+    </button>
+    <button class="nav-tile" onclick="show('quiz',document.querySelectorAll('.nav-btn')[2])">
+      <span class="nt-icon">🎯</span>
+      <div class="nt-label">Quizzes</div>
+      <div class="nt-desc">Test your knowledge</div>
+    </button>
+    <button class="nav-tile" onclick="show('qa',document.querySelectorAll('.nav-btn')[3])">
+      <span class="nt-icon">💬</span>
+      <div class="nt-label">Questions</div>
+      <div class="nt-desc">Ask your mentor anything</div>
+    </button>
+    <button class="nav-tile" onclick="show('sug',document.querySelectorAll('.nav-btn')[4])">
+      <span class="nt-icon">💡</span>
+      <div class="nt-label">Suggestions</div>
+      <div class="nt-desc">Books, videos &amp; resources</div>
+    </button>
   </div>
+</section>
 
-  <!-- Info -->
-  <div class="info-banner">
-    <span class="ib-icon">💡</span>
-    <div>
-      <strong style="color:var(--dark);font-family:'Nunito',sans-serif;font-weight:800">How these quizzes work</strong><br>
-      Click any topic to start. Answer each question and get instant feedback — right or wrong, you'll see an explanation.
-      Your best scores are saved in this browser. Aim for 75%+ on each topic before moving on.
-    </div>
+<!-- ═══ DAILY WORK ═══ -->
+<section class="section" id="sec-daily">
+  <div class="pg-title">📚 Daily Work</div>
+  <div class="pg-sub">Tick off tasks as you go. Mark the day complete when you're done.</div>
+  <div class="week-tabs" id="week-tabs"></div>
+  <div id="day-list"></div>
+</section>
+
+<!-- ═══ QUIZZES ═══ -->
+<section class="section" id="sec-quiz">
+  <div class="pg-title">🎯 Quizzes</div>
+  <div class="pg-sub">Click any topic to open the quiz. Instant feedback, full explanations. Aim for 75%+.</div>
+  <div class="quiz-grid" id="quiz-grid"></div>
+  <div class="card c-purple" style="font-size:.84em;color:#666;line-height:1.7">
+    <strong style="color:var(--dark);font-family:'Nunito',sans-serif">💡 How quizzes work</strong><br>
+    Scores are saved automatically in your browser. Retake as many times as you like — the goal is understanding, not the number. More topics unlock in Weeks 2 and 3.
   </div>
+</section>
 
-</div>
-
-<!-- Modal -->
-<div class="overlay" id="overlay" onclick="handleOverlay(event)">
-  <div class="modal">
-    <button class="modal-close" onclick="close_()">✕</button>
-    <div id="modal-body"></div>
+<!-- ═══ QUESTIONS ═══ -->
+<section class="section" id="sec-qa">
+  <div class="pg-title">💬 Questions</div>
+  <div class="pg-sub">No question is too basic. Your mentor will reply — usually within a day.</div>
+  <div class="qa-submit-box">
+    <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:.9em">Ask a question</div>
+    <div style="font-size:.78em;color:var(--gray);margin-top:3px">Biology, methods, data, careers — anything.</div>
+    <textarea class="qa-textarea" id="qa-input" rows="4" placeholder="Type your question here..."></textarea>
+    <button class="btn-ask" onclick="submitQ()">Send to mentor →</button>
   </div>
-</div>
+  <div id="qa-list"></div>
+</section>
 
+<!-- ═══ SUGGESTIONS ═══ -->
+<section class="section" id="sec-sug">
+  <div class="pg-title">💡 Suggestions</div>
+  <div class="pg-sub">Picked by your mentor — things worth your time.</div>
+  <div id="sug-list"></div>
+</section>
+
+</main>
 <script>
-// ═══════════════════════════════════════════════════════
-//  QUIZ DATA — add / edit questions here
-// ═══════════════════════════════════════════════════════
-const QUIZZES = [
-  {
-    id: "gut-basics",
-    title: "Gut Microbiome Basics",
-    icon: "🦠",
-    color: "coral",
-    questions: [
-      {
-        q: "Approximately how many different bacterial species live in a healthy adult gut?",
-        opts: ["10–50 species", "100–200 species", "1,000+ species", "10,000+ species"],
-        ans: 2,
-        exp: "A healthy gut hosts over 1,000 different species, though each person typically has a few hundred dominant ones. Diversity varies significantly between individuals and is influenced by diet, antibiotics, and early-life exposures."
-      },
-      {
-        q: "What are short-chain fatty acids (SCFAs)?",
-        opts: [
-          "Antibodies produced by gut bacteria",
-          "Small molecules produced when bacteria ferment dietary fibre — including butyrate, propionate, and acetate",
-          "Types of bacteria found only in infants",
-          "Fats secreted by the mucus layer"
-        ],
-        ans: 1,
-        exp: "SCFAs are produced when gut bacteria break down dietary fibre that we can't digest. Butyrate is especially important — it feeds colon cells and promotes regulatory T cells that suppress allergic immune responses."
-      },
-      {
-        q: "The hygiene hypothesis proposes that rising allergy rates are partly caused by:",
-        opts: [
-          "Eating too many allergenic foods in early childhood",
-          "Vaccines confusing the immune system",
-          "Reduced early-life microbial exposure, leaving the immune system undertrained",
-          "Genetic mutations becoming more common"
-        ],
-        ans: 2,
-        exp: "The hygiene hypothesis proposes that industrialisation has reduced our contact with the diverse microbes our immune systems co-evolved with — leaving it prone to overreacting to harmless things like food proteins."
-      },
-      {
-        q: "In germ-free mice (raised with no gut bacteria), what happens to the immune system?",
-        opts: [
-          "It becomes stronger — no bacteria means no distractions",
-          "It develops normally but produces more IgE",
-          "It stays underdeveloped, with fewer regulatory T cells and impaired IgA production",
-          "Nothing — it develops independently of bacteria"
-        ],
-        ans: 2,
-        exp: "Germ-free animals have consistently underdeveloped immune systems: fewer Tregs, impaired IgA, and far higher susceptibility to allergy and autoimmune disease. This is direct experimental proof that gut bacteria are essential for immune development."
-      }
-    ]
-  },
-  {
-    id: "bacteria",
-    title: "Key Bacteria",
-    icon: "🔬",
-    color: "purple",
-    questions: [
-      {
-        q: "Which bacterium is called 'the peacekeeper' because it is the gut's main butyrate producer?",
-        opts: ["Akkermansia muciniphila", "Faecalibacterium prausnitzii", "Bacteroides fragilis", "Bifidobacterium longum"],
-        ans: 1,
-        exp: "F. prausnitzii makes up ~5% of all bacteria in a healthy adult gut and is one of its most important butyrate producers. It is consistently lower in patients with IBD, Crohn's disease, and food allergy."
-      },
-      {
-        q: "What does 'muciniphila' mean in Akkermansia muciniphila?",
-        opts: ["Mucus destroyer", "Mucus lover / eater", "Mucus producer", "Resistant to mucus"],
-        ans: 1,
-        exp: "'Mucin' = mucus, 'phila' = lover (Greek). Akkermansia feeds on the mucus layer — but paradoxically stimulates cells to make MORE mucus in response, strengthening the gut barrier rather than destroying it."
-      },
-      {
-        q: "In Feehley et al. 2019, the key bacteria that protected germ-free mice from peanut allergy belonged to which group?",
-        opts: ["Bifidobacterium", "Akkermansia muciniphila", "Clostridiales", "Lactobacillus rhamnosus GG"],
-        ans: 2,
-        exp: "The protective bacteria came from the order Clostridiales — including Lachnospiraceae and Ruminococcaceae. These bacteria colonise the infant gut in the first weeks of life and are critical for immune tolerance."
-      },
-      {
-        q: "What single molecule does Bacteroides fragilis produce that directly trains the immune system?",
-        opts: ["Butyrate", "IgA", "Polysaccharide A (PSA)", "Mucin"],
-        ans: 2,
-        exp: "PSA is unique to B. fragilis. Sarkis Mazmanian's lab showed that PSA alone can rescue immune defects in germ-free mice — specifically by promoting regulatory T cell development and correcting Th1/Th2 imbalances."
-      },
-      {
-        q: "Why is Bifidobacterium infantis uniquely suited to the infant gut?",
-        opts: [
-          "It produces the highest amount of butyrate of any gut bacterium",
-          "It has unique genes for digesting human milk oligosaccharides (HMOs) in breast milk",
-          "It is the largest bacterium in the infant gut",
-          "It produces antibodies that protect against infection"
-        ],
-        ans: 1,
-        exp: "B. infantis carries a unique gene cluster for breaking down HMOs — complex sugars in breast milk that the baby itself cannot digest. Breast milk essentially 'feeds the bacteria', not just the baby. This specialised relationship is millions of years old."
-      }
-    ]
-  },
-  {
-    id: "dna",
-    title: "DNA & Sequencing",
-    icon: "🧬",
-    color: "green",
-    questions: [
-      {
-        q: "DNA is made of 4 chemical bases. Which set is correct?",
-        opts: ["A, T, G, C", "A, U, G, C", "A, T, G, P", "A, B, G, C"],
-        ans: 0,
-        exp: "DNA uses Adenine (A), Thymine (T), Guanine (G), and Cytosine (C). RNA uses Uracil (U) instead of Thymine. This 4-letter alphabet encodes all genetic information."
-      },
-      {
-        q: "What is a FASTQ file?",
-        opts: [
-          "A database of all known bacterial species",
-          "A text file storing DNA sequences plus a quality score for every base",
-          "A compressed gel image",
-          "A MetaPhlAn4 abundance report"
-        ],
-        ans: 1,
-        exp: "FASTQ is the standard format for raw sequencing output. Each read has 4 lines: (1) sequence ID, (2) the DNA sequence, (3) a '+' separator, (4) Phred quality scores — one ASCII character per base."
-      },
-      {
-        q: "A Phred quality score of Q30 means:",
-        opts: [
-          "30% accuracy — the base is probably wrong",
-          "1 error in 30 bases",
-          "1 error in 1,000 bases (99.9% accuracy)",
-          "The read is 30 bases long"
-        ],
-        ans: 2,
-        exp: "Phred scores are logarithmic: Q30 = 99.9% accuracy (1 error per 1,000 bases). Q20 = 99%, Q40 = 99.99%. In metagenomics QC we typically require bases at Q≥20 before trusting them."
-      },
-      {
-        q: "Shotgun metagenomics sequences everything at once. What new problem does this create?",
-        opts: [
-          "The sequencer needs to run longer",
-          "We don't know which species each read came from — we need computational tools to classify them",
-          "We need RNA instead of DNA",
-          "Quality scores become less reliable"
-        ],
-        ans: 1,
-        exp: "When sequencing all DNA simultaneously, millions of short reads come from dozens of organisms. Tools like MetaPhlAn4 compare each read to a reference database to classify its source organism — a computational challenge that doesn't exist when sequencing one genome."
-      }
-    ]
-  },
-  {
-    id: "pipeline",
-    title: "Metagenomics Pipeline",
-    icon: "⚙️",
-    color: "orange",
-    questions: [
-      {
-        q: "What is the main purpose of KneadData in the bioBakery pipeline?",
-        opts: [
-          "Count how many bacteria are in each sample",
-          "Remove human DNA contamination from gut samples",
-          "Identify active metabolic pathways",
-          "Align reads to a bacterial reference"
-        ],
-        ans: 1,
-        exp: "Gut samples contain both microbial and human DNA (from shed gut cells). KneadData aligns reads to the human genome and removes matches. Without this, human sequences contaminate the microbial analysis."
-      },
-      {
-        q: "MetaPhlAn4 tells us which bacteria are present. What type of output does it give?",
-        opts: [
-          "Raw DNA sequences",
-          "A list of active metabolic pathways",
-          "Relative abundance of each species — e.g. F. prausnitzii: 4.7%",
-          "Phred quality scores"
-        ],
-        ans: 2,
-        exp: "MetaPhlAn4 uses clade-specific marker genes to identify species and estimate their relative abundance. This composition profile — who is present and in what proportion — is what we compare between allergy cases and healthy controls."
-      },
-      {
-        q: "Alpha diversity measures diversity within one sample. Beta diversity measures:",
-        opts: [
-          "Total species count across all samples",
-          "How different the microbial compositions are between samples",
-          "Average abundance of one bacterium across all samples",
-          "Sequencing depth per sample"
-        ],
-        ans: 1,
-        exp: "Beta diversity compares microbial communities between samples. High beta diversity between two groups (e.g. allergy vs. healthy) means their microbiomes look very different. PCoA plots visualise this — similar samples cluster together."
-      },
-      {
-        q: "MaAsLin2, used in Week 3, does what?",
-        opts: [
-          "Aligns raw reads to a reference genome",
-          "Compresses FASTQ files for storage",
-          "Finds which bacteria are statistically associated with food allergy, adjusting for confounders",
-          "Measures sequencing quality"
-        ],
-        ans: 2,
-        exp: "MaAsLin2 (Multivariate Association with Linear Models) tests associations between microbiome features and metadata (e.g. allergy status, age, diet). It adjusts for confounding variables so you identify bacteria genuinely linked to food allergy, not just correlated by chance."
-      }
-    ]
-  }
-]
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  DATA — Edit this section to update the platform content.             ║
+// ║  After editing, commit the file on GitHub. Site updates in ~1 min.   ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+const DATA = {
 
-// ═══════════════════════════════════════════════════════
-//  ENGINE
-// ═══════════════════════════════════════════════════════
-const store = JSON.parse(localStorage.getItem('quiz_hub') || '{}')
-const save  = () => localStorage.setItem('quiz_hub', JSON.stringify(store))
-let state   = null
+  // ── Basic info ────────────────────────────────────────────────────────
+  student:      { name: "Intern" },          // ← change to student's name
+  mentor_email: "your@email.com",            // ← change to your email
+  quiz_url:     "quiz.html",                 // quiz page (keep as-is)
 
-// render cards
-function renderGrid() {
-  const attempted = QUIZZES.filter(q => store[q.id] !== undefined).length
-  const psText    = document.getElementById('ps-text')
-  if (attempted === 0) {
-    psText.textContent = 'No quizzes completed yet — pick one to start!'
-  } else if (attempted === QUIZZES.length) {
-    psText.textContent = `All ${QUIZZES.length} quizzes done! 🎉`
-    document.getElementById('all-done').classList.add('show')
-  } else {
-    psText.textContent = `${attempted} / ${QUIZZES.length} topics attempted`
-  }
+  // ── Weekly schedule ───────────────────────────────────────────────────
+  // locked:true → shows "Coming Soon".  locked:false → shows day cards.
+  weeks: [
+    {
+      id:1, title:"Week 1", subtitle:"Foundations", locked:false,
+      days:[
+        {
+          id:1, color:"coral",
+          title:"Welcome + Gut Microbiome Universe",
+          pills:["Gut Microbiome","Bacteria","Immune System"],
+          objectives:[
+            "Understand what the gut microbiome is and why it matters",
+            "Learn which bacteria live in the gut and their basic roles",
+            "Connect gut bacteria to food allergy and immune function"
+          ],
+          tasks:[
+            {type:"watch", label:"Kurzgesagt: The Gut Microbiome (~10 min)", url:"https://www.youtube.com/results?search_query=Kurzgesagt+gut+microbiome+hidden+organ"},
+            {type:"watch", label:"Kurzgesagt: The Immune System Explained I (~8 min)", url:"https://www.youtube.com/results?search_query=Kurzgesagt+immune+system+bacteria"},
+            {type:"watch", label:"Kurzgesagt: The Hygiene Hypothesis (~10 min)", url:"https://www.youtube.com/results?search_query=Kurzgesagt+hygiene+hypothesis"},
+            {type:"read",  label:"key_gut_bacteria.md — introduction and 'Why These Six?' section"},
+            {type:"write", label:"Lab notebook: What surprised you most? Write at least 3 sentences."},
+            {type:"think", label:"Reflection: Before today, what did you think gut bacteria actually did?"}
+          ],
+          mission:"By end of Day 1, explain to someone why gut bacteria matter for food allergy — in plain English, no jargon."
+        },
+        {
+          id:2, color:"purple",
+          title:"Taxonomy & Diversity",
+          pills:["Classification","Alpha Diversity","Beta Diversity"],
+          objectives:[
+            "Understand bacterial taxonomy: Kingdom → Phylum → Class → Order → Family → Genus → Species",
+            "Know what alpha and beta diversity mean in the gut microbiome",
+            "Explore 3 key bacteria and complete Species Cards in your lab notebook"
+          ],
+          tasks:[
+            {type:"explore", label:"NCBI Taxonomy: look up all 6 key bacteria, write their full classification", url:"https://www.ncbi.nlm.nih.gov/taxonomy"},
+            {type:"watch",   label:"SciShow: Why Are We Allergic to Anything? (~8 min)", url:"https://www.youtube.com/results?search_query=SciShow+why+are+we+allergic+to+anything"},
+            {type:"read",    label:"key_gut_bacteria.md — answer notebook questions for Bacteria #1, #2, #3"},
+            {type:"write",   label:"Fill in 3 Species Cards (template in key_gut_bacteria.md)"},
+            {type:"think",   label:"Is more gut diversity always better? Why or why not?"}
+          ],
+          mission:"Complete 3 Species Cards and answer at least 8 questions from key_gut_bacteria.md."
+        },
+        {
+          id:3, color:"orange",
+          title:"Cohorts, Papers & Research Design",
+          pills:["Case-Control","Cohort Study","Reading Papers"],
+          objectives:[
+            "Understand what a case-control study is",
+            "Learn how to read a scientific paper (abstract + figures only)",
+            "Understand what our food allergy cohort looks like"
+          ],
+          tasks:[
+            {type:"read",  label:"Feehley et al. 2019 — abstract + Figure 1 + Figure 3 only", url:"https://doi.org/10.1038/s41591-018-0324-z"},
+            {type:"read",  label:"Arrieta et al. 2015 — abstract + Figure 1 only", url:"https://doi.org/10.1126/scitranslmed.aab2271"},
+            {type:"watch", label:"TED-Ed: What is a food allergy? (~5 min)", url:"https://www.youtube.com/results?search_query=TED-Ed+food+allergy+Eleanor+Nelsen"},
+            {type:"write", label:"Lab notebook: 1-sentence summary for each paper"},
+            {type:"write", label:"Draw the cohort: cases vs controls, what we collect, what we measure"},
+            {type:"think", label:"How would you design a study on food allergy and gut bacteria?"}
+          ],
+          mission:"Explain the Feehley 2019 study out loud — what they did, found, and why it matters. No reading."
+        },
+        {
+          id:4, color:"green",
+          title:"DNA, Sequencing & Metagenomics",
+          pills:["DNA","FASTQ","Shotgun Sequencing","Metagenomics"],
+          objectives:[
+            "Understand the structure of DNA and how genetic information is encoded",
+            "Learn how shotgun metagenomics works step by step",
+            "Read a FASTQ file and understand what each line means"
+          ],
+          tasks:[
+            {type:"watch",   label:"TED-Ed: What is DNA? (~5 min)", url:"https://www.youtube.com/results?search_query=TED-Ed+what+is+DNA+and+how+does+it+work"},
+            {type:"watch",   label:"Shotgun metagenomics explained (~5–8 min)", url:"https://www.youtube.com/results?search_query=shotgun+metagenomics+explained"},
+            {type:"watch",   label:"Illumina sequencing by synthesis (~5 min)", url:"https://www.youtube.com/results?search_query=Illumina+sequencing+by+synthesis"},
+            {type:"practice",label:"Open an example .fastq file — identify the 4 lines of one read and explain each"},
+            {type:"write",   label:"Draw the pipeline: stool sample → DNA → sequence → FASTQ → what next?"},
+            {type:"think",   label:"Why can't we just grow bacteria instead of sequencing them?"}
+          ],
+          mission:"Explain in your own words: what is in a FASTQ file and why do we need sequencing to study the gut microbiome?"
+        },
+        {
+          id:5, color:"gold",
+          title:"Linux Intro + Week 1 Presentation",
+          pills:["Linux","Terminal","Command Line","Presentation"],
+          objectives:[
+            "Learn 10 essential Linux terminal commands",
+            "Navigate the HPC server file system",
+            "Give a 5-minute presentation on Week 1"
+          ],
+          tasks:[
+            {type:"watch",   label:"Linux command line for beginners (~10 min)", url:"https://www.youtube.com/results?search_query=linux+command+line+beginners+tutorial"},
+            {type:"practice",label:"Terminal practice: pwd, ls, cd, mkdir, cat, cp, mv, rm, grep, man"},
+            {type:"explore", label:"Log in to the HPC server with your mentor's guidance"},
+            {type:"write",   label:"Prepare your 5-min talk: What is the gut microbiome and why does food allergy care?"},
+            {type:"think",   label:"What is the one question you most want to answer by the end of this internship?"}
+          ],
+          mission:"Give your 5-minute summary to your mentor from memory — no notes, just talk."
+        }
+      ]
+    },
+    {id:2, title:"Week 2", subtitle:"Bioinformatics Pipeline", locked:true, days:[]},
+    {id:3, title:"Week 3", subtitle:"Analysis & Results",       locked:true, days:[]}
+  ],
 
-  document.getElementById('grid').innerHTML = QUIZZES.map(q => {
-    const best = store[q.id]
-    const pct  = best !== undefined ? Math.round(best * 100 / q.questions.length) : null
-    let badge  = `<span class="qcard-badge score-new">Start ›</span>`
-    if (pct !== null) {
-      const cls = pct >= 75 ? 'score-great' : pct >= 50 ? 'score-ok' : 'score-low'
-      const lbl = pct >= 75 ? `${pct}% ★ Great!` : pct >= 50 ? `${pct}% Keep going` : `${pct}% Try again`
-      badge = `<span class="qcard-badge ${cls}">${lbl}</span>`
+  // ── Quiz topics (cards + scores; clicking opens quiz.html) ────────────
+  // The `id` must match the quiz id in quiz.html.
+  quizTopics:[
+    {id:"gut-basics", title:"Gut Microbiome Basics", icon:"🦠", color:"coral",  questions:4},
+    {id:"bacteria",   title:"Key Bacteria",           icon:"🔬", color:"purple", questions:5},
+    {id:"dna",        title:"DNA & Sequencing",       icon:"🧬", color:"green",  questions:4},
+    {id:"pipeline",   title:"Metagenomics Pipeline",  icon:"⚙️", color:"orange", questions:4}
+  ],
+
+  // ── Q&A ──────────────────────────────────────────────────────────────
+  // To answer: fill in `answer` and set status:"answered".
+  // To add a new question: copy an entry and edit it.
+  qa:[
+    {
+      id:1, date:"2026-07-01",
+      question:"What exactly is metagenomics? Is it different from sequencing one bacterium?",
+      answer:"Great question! When we sequence one bacterium, we grow it in the lab and read its genome alone. Metagenomics is completely different — we take DNA from the whole gut sample (thousands of species at once) and sequence everything simultaneously, then use software to work out which reads came from which organism. Think of it like tipping all your jigsaw puzzles onto one table and sorting the pieces back into the right boxes.",
+      status:"answered"
     }
-    return `<div class="qcard c-${q.color}" onclick="start('${q.id}')">
-      <span class="qcard-icon">${q.icon}</span>
-      <div class="qcard-title">${q.title}</div>
-      <div class="qcard-count">${q.questions.length} questions</div>
-      ${badge}
+    // ← Add new Q&A entries here in the same format.
+  ],
+
+  // ── Suggestions ───────────────────────────────────────────────────────
+  // color options: coral, purple, green, gold, orange.  url:"" hides the link.
+  suggestions:[
+    {
+      category:"🎬 Videos — Start Here",
+      items:[
+        {title:"The Gut Microbiome", author:"Kurzgesagt (~10 min)", desc:"Best first video on the microbiome. Beautiful animation, scientifically accurate.", url:"https://www.youtube.com/results?search_query=Kurzgesagt+gut+microbiome+hidden+organ", color:"coral"},
+        {title:"The Hygiene Hypothesis", author:"Kurzgesagt (~10 min)", desc:"The core theory behind our research — why 'too clean' environments raise allergy risk.", url:"https://www.youtube.com/results?search_query=Kurzgesagt+hygiene+hypothesis", color:"coral"},
+        {title:"Gut Bacteria & the Immune System", author:"Sarkis Mazmanian, TED (~15 min)", desc:"The researcher who discovered how B. fragilis trains immune tolerance. One of the best talks in the field.", url:"https://www.youtube.com/results?search_query=Sarkis+Mazmanian+gut+bacteria+immune+TED", color:"purple"},
+        {title:"How Microbes Make Us Who We Are", author:"Rob Knight, TED (~20 min)", desc:"A founder of modern microbiome research — covers early-life microbiome and allergy.", url:"https://www.ted.com/talks/rob_knight_how_our_microbes_make_us_who_we_are", color:"purple"}
+      ]
+    },
+    {
+      category:"📚 Books — Pick One",
+      items:[
+        {title:"Gut", author:"Giulia Enders", desc:"Written by a medical student for her grandmother. Funny, accurate, easy to read. Start with Chapter 1.", url:"", color:"green"},
+        {title:"I Contain Multitudes", author:"Ed Yong", desc:"Pulitzer Prize-winning science journalist. Chapter 6 covers immune interactions directly.", url:"", color:"green"},
+        {title:"Missing Microbes", author:"Martin Blaser", desc:"How antibiotics have disrupted our ancestral microbiome and its links to allergy.", url:"", color:"green"}
+      ]
+    },
+    {
+      category:"🌐 Websites",
+      items:[
+        {title:"NCBI Taxonomy Browser", author:"NCBI", desc:"Look up any bacterium — full classification tree, links to papers and sequences.", url:"https://www.ncbi.nlm.nih.gov/taxonomy", color:"gold"},
+        {title:"GMrepo", author:"Gut Microbiome Database", desc:"Real gut microbiome datasets organised by disease. Search 'food allergy' to see which bacteria differ.", url:"https://gmrepo.humangut.info", color:"gold"},
+        {title:"The Conversation", author:"Academic journalism", desc:"Researchers writing for the public. Search 'food allergy microbiome' for recent articles.", url:"https://theconversation.com", color:"gold"},
+        {title:"Your Genome", author:"Wellcome Sanger Institute", desc:"Clear student-friendly explainers on DNA, sequencing and the microbiome.", url:"https://www.yourgenome.org", color:"orange"}
+      ]
+    }
+    // ← Add more suggestion categories here.
+  ]
+}
+
+// ╔══════════════════════════════════════════════════════════════════════╗
+// ║  APP — no need to edit below this line.                              ║
+// ╚══════════════════════════════════════════════════════════════════════╝
+const store = JSON.parse(localStorage.getItem('intern_hub') || '{}')
+const save  = () => localStorage.setItem('intern_hub', JSON.stringify(store))
+const ICONS = {watch:'📺',read:'📖',write:'✍️',explore:'🔗',think:'🤔',practice:'💻'}
+const esc   = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))
+
+let activeWeek = 1, openDay = null
+
+document.getElementById('greeting').textContent = '👋 ' + esc(DATA.student.name)
+document.getElementById('hero-name').textContent = DATA.student.name
+
+// nav
+function show(sec, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'))
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'))
+  document.getElementById('sec-'+sec).classList.add('active')
+  if (btn) btn.classList.add('active')
+  window.scrollTo(0,0)
+}
+
+// ── Daily Work ──────────────────────────────────────────────────────────
+function renderTabs() {
+  document.getElementById('week-tabs').innerHTML = DATA.weeks.map(w =>
+    `<button class="wtab ${w.id===activeWeek?'active':''} ${w.locked?'locked':''}"
+       ${w.locked?'':`onclick="switchWeek(${w.id})"`}>
+       ${w.title} ${w.locked?'🔒':''}<br>
+       <small style="font-weight:600;opacity:.65;font-size:.88em">${esc(w.subtitle)}</small>
+     </button>`
+  ).join('')
+}
+
+function renderDays() {
+  const week = DATA.weeks.find(w => w.id===activeWeek)
+  const el   = document.getElementById('day-list')
+  if (week.locked) {
+    el.innerHTML = `<div class="card c-purple" style="text-align:center;padding:40px 20px">
+      <div style="font-size:2.6em;margin-bottom:12px">🔒</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05em">Coming Soon</div>
+      <div style="color:var(--gray);font-size:.86em;margin-top:8px;line-height:1.6">
+        ${esc(week.subtitle)} content will be added before Week ${week.id} starts.
+      </div></div>`
+    return
+  }
+  el.innerHTML = week.days.map(day => {
+    const done  = !!store[`day_${week.id}_${day.id}`]
+    const tDone = day.tasks.filter((_,i) => store[`t_${week.id}_${day.id}_${i}`]).length
+    const isOpen = openDay === day.id
+    return `
+    <div class="day-card c-${day.color} ${isOpen?'is-open':''}" id="dc-${day.id}" onclick="toggleDay(${day.id})">
+      <div class="day-hdr">
+        <span class="day-num">Day ${day.id}</span>
+        <span class="day-title-txt">${esc(day.title)}</span>
+        <span class="day-meta">${tDone}/${day.tasks.length} &nbsp;${done?'✅':'○'}</span>
+        <span class="day-arrow">›</span>
+      </div>
+      <div style="margin-top:7px">${day.pills.map(p=>`<span class="pill p-${day.color}">${esc(p)}</span>`).join('')}</div>
+    </div>
+    <div class="day-detail ${isOpen?'open':''}" id="dd-${day.id}">
+      <div class="sec-lbl">Objectives</div>
+      <ul class="obj-list">${day.objectives.map(o=>`<li>${esc(o)}</li>`).join('')}</ul>
+      <div class="sec-lbl" style="margin-top:16px">Tasks</div>
+      ${day.tasks.map((t,i) => {
+        const key = `t_${week.id}_${day.id}_${i}`
+        const chk = !!store[key]
+        const lbl = t.url ? `<a href="${t.url}" target="_blank" rel="noreferrer">${esc(t.label)}</a>` : esc(t.label)
+        return `<div class="task-row">
+          <span class="t-icon">${ICONS[t.type]||'▸'}</span>
+          <span class="t-label">${lbl}</span>
+          <div class="t-check ${chk?'done':''}" id="ck-${key}" onclick="toggleTask('${key}',event)"></div>
+        </div>`
+      }).join('')}
+      <div class="mission-box">
+        <div class="mission-lbl">🎯 Today's Mission</div>
+        <div style="font-size:.84em;line-height:1.65;color:var(--dark)">${esc(day.mission)}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:12px">
+        <button class="btn-complete" onclick="markDone(${week.id},${day.id},event)">Mark Day Complete ✓</button>
+        ${done?'<span style="font-size:.78em;color:var(--green-dk)">✅ Completed!</span>':''}
+      </div>
     </div>`
   }).join('')
 }
 
-// quiz flow
-function start(id) {
-  state = { quiz: QUIZZES.find(q => q.id===id), cur: 0, score: 0, answered: false }
-  document.getElementById('overlay').classList.add('open')
-  renderQ()
+function switchWeek(id){ activeWeek=id; openDay=null; renderTabs(); renderDays() }
+
+function toggleDay(id){
+  if (openDay===id){
+    document.getElementById('dd-'+id).classList.remove('open')
+    document.getElementById('dc-'+id).classList.remove('is-open')
+    openDay = null
+  } else {
+    if (openDay){
+      document.getElementById('dd-'+openDay).classList.remove('open')
+      document.getElementById('dc-'+openDay).classList.remove('is-open')
+    }
+    document.getElementById('dd-'+id).classList.add('open')
+    document.getElementById('dc-'+id).classList.add('is-open')
+    openDay = id
+  }
 }
 
-function close_() {
-  document.getElementById('overlay').classList.remove('open')
-  state = null
-  renderGrid()
+function toggleTask(key, e){
+  e.stopPropagation()
+  store[key] = !store[key]; save()
+  document.getElementById('ck-'+key).classList.toggle('done', store[key])
+  // update the header count without collapsing the open card
+  const [,w,d] = key.split('_')
+  const day = DATA.weeks.find(x=>x.id==w).days.find(x=>x.id==d)
+  const tDone = day.tasks.filter((_,i)=>store[`t_${w}_${d}_${i}`]).length
+  const done  = !!store[`day_${w}_${d}`]
+  document.querySelector(`#dc-${d} .day-meta`).innerHTML = `${tDone}/${day.tasks.length} &nbsp;${done?'✅':'○'}`
 }
 
-function handleOverlay(e) { if (e.target.id==='overlay') close_() }
-
-function renderQ() {
-  const { quiz, cur } = state
-  const q = quiz.questions[cur]
-  document.getElementById('modal-body').innerHTML = `
-    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1em;margin-bottom:10px">${quiz.icon} ${quiz.title}</div>
-    <div class="qdots">${quiz.questions.map((_,i)=>`<div class="qdot ${i<cur?'done':i===cur?'cur':''}"></div>`).join('')}</div>
-    <div class="q-tag">Question ${cur+1} of ${quiz.questions.length}</div>
-    <div class="q-text">${q.q}</div>
-    <div class="opts">${q.opts.map((o,i)=>`<button class="opt" id="o${i}" onclick="pick(${i})">${o}</button>`).join('')}</div>
-    <div class="expl" id="expl">${q.exp}</div>
-    <button class="btn-next" id="bnxt" onclick="next()">${cur+1<quiz.questions.length?'Next question →':'See my results →'}</button>
-  `
+function markDone(wid, did, e){
+  e.stopPropagation()
+  store[`day_${wid}_${did}`] = true; save(); renderDays()
 }
 
-function pick(idx) {
-  if (state.answered) return
-  state.answered = true
-  const q = state.quiz.questions[state.cur]
-  document.querySelectorAll('.opt').forEach((b,i) => {
-    b.disabled = true
-    if (i===q.ans) b.classList.add('correct')
-    else if (i===idx) b.classList.add('wrong')
-  })
-  if (idx===q.ans) state.score++
-  document.getElementById('expl').classList.add('show')
-  document.getElementById('bnxt').classList.add('show')
+// ── Quizzes ─────────────────────────────────────────────────────────────
+function renderQuiz(){
+  const scores = JSON.parse(localStorage.getItem('quiz_hub') || '{}')
+  document.getElementById('quiz-grid').innerHTML = DATA.quizTopics.map(q => {
+    const best = scores[q.id]
+    const pct  = best !== undefined ? Math.round(best*100/q.questions) : null
+    let badge  = `<span class="qz-badge b-new">Start →</span>`
+    if (pct !== null){
+      const cls = pct>=75?'b-great':pct>=50?'b-ok':'b-low'
+      const lbl = pct>=75?`${pct}% ★`:pct>=50?`${pct}% Good`:`${pct}% Retry`
+      badge = `<span class="qz-badge ${cls}">${lbl}</span>`
+    }
+    return `<a class="qz-card c-${q.color}" href="${DATA.quiz_url}" target="_blank" rel="noreferrer">
+      <span class="qz-icon">${q.icon}</span>
+      <div class="qz-title">${esc(q.title)}</div>
+      <div class="qz-count">${q.questions} questions</div>
+      ${badge}
+    </a>`
+  }).join('')
 }
 
-function next() {
-  state.cur++
-  state.answered = false
-  if (state.cur >= state.quiz.questions.length) showResult()
-  else renderQ()
+// ── Q&A ─────────────────────────────────────────────────────────────────
+function renderQA(){
+  const el = document.getElementById('qa-list')
+  el.innerHTML = DATA.qa.length === 0
+    ? `<div style="text-align:center;color:var(--gray);padding:40px;font-size:.9em">No questions yet — ask one above!</div>`
+    : [...DATA.qa].reverse().map(qa => `
+      <div class="qa-item">
+        <div class="qa-row">
+          <div class="qa-av av-s">You</div>
+          <div class="qa-bubble">${esc(qa.question)}</div>
+        </div>
+        <div class="qa-date">${esc(qa.date)}</div>
+        ${qa.status==='answered'
+          ? `<div class="qa-row" style="margin-top:12px">
+               <div class="qa-av av-m">Dr.</div>
+               <div class="qa-bubble mentor">${esc(qa.answer)}</div>
+             </div>`
+          : `<div class="qa-pending">⏳ Your mentor will reply soon...</div>`}
+      </div>`).join('')
 }
 
-function showResult() {
-  const { quiz, score } = state
-  const total = quiz.questions.length
-  const pct   = Math.round(score*100/total)
-  const emoji = pct>=75?'🎉':pct>=50?'👍':'💪'
-  const stars = pct>=75?'★★★':pct>=50?'★★☆':'★☆☆'
-  const msg   = pct>=75
-    ? 'Excellent! You really understand this material.'
-    : pct>=50
-    ? 'Good effort — review the explanations and try again to get above 75%.'
-    : 'Keep studying! Read through the explanations and retake the quiz.'
-  const prev = store[quiz.id]
-  if (prev===undefined || score>prev) { store[quiz.id]=score; save() }
-  document.getElementById('modal-body').innerHTML = `
-    <div class="result">
-      <span class="result-emoji">${emoji}</span>
-      <div class="stars">${stars.split('').map(s=>`<span style="color:${s==='★'?'#ffd700':'#ddd'}">${s}</span>`).join('')}</div>
-      <div class="result-score">${score} / ${total}</div>
-      <div class="result-pct">${pct}%</div>
-      <div class="result-msg">${msg}</div>
-      <div class="result-btns">
-        <button class="btn-retry" onclick="start('${quiz.id}')">Try again 🔄</button>
-        <button class="btn-done"  onclick="close_()">Back to quizzes</button>
+function submitQ(){
+  const input = document.getElementById('qa-input')
+  const q     = input.value.trim()
+  if (!q) return
+  const sub  = encodeURIComponent('[Internship Question] ' + q.slice(0,80))
+  const body = encodeURIComponent(q + '\n\n— Sent from Internship Hub')
+  window.location.href = `mailto:${DATA.mentor_email}?subject=${sub}&body=${body}`
+  input.value = ''
+}
+
+// ── Suggestions ──────────────────────────────────────────────────────────
+function renderSuggestions(){
+  document.getElementById('sug-list').innerHTML = DATA.suggestions.map(sec => `
+    <div class="sug-section">
+      <div class="sug-heading">${esc(sec.category)}</div>
+      <div class="sug-grid">
+        ${sec.items.map(it => `
+          <div class="sug-card s-${it.color}">
+            <div class="sug-title">${esc(it.title)}</div>
+            <div class="sug-author">${esc(it.author)}</div>
+            <div class="sug-desc">${esc(it.desc)}</div>
+            ${it.url ? `<a class="sug-link" href="${it.url}" target="_blank" rel="noreferrer">Open →</a>` : ''}
+          </div>`).join('')}
       </div>
-    </div>`
+    </div>`).join('')
 }
 
-renderGrid()
+// ── Init ─────────────────────────────────────────────────────────────────
+renderTabs(); renderDays(); renderQuiz(); renderQA(); renderSuggestions()
 </script>
 </body>
 </html>
