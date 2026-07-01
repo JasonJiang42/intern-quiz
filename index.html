@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧫 Microbiome Quiz Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --coral:#ff9aa2; --coral-dk:#e74c3c;
+      --purple:#c7ceea; --purple-dk:#5c6bc0;
+      --orange:#ffdac1; --orange-dk:#e67e22;
+      --green:#b5ead7;  --green-dk:#27ae60;
+      --gold:#ffe066;   --gold-dk:#b8860b;
+      --dark:#2d2d4e;   --gray:#7c83a0;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'Nunito Sans',sans-serif;
+      min-height:100vh;color:var(--dark);
+      background:linear-gradient(135deg,#e0f7fa 0%,#e8eaf6 55%,#fce4ec 100%);
+    }
+
+    /* ── Blobs ── */
+    .blob{position:fixed;border-radius:50%;filter:blur(72px);opacity:.22;pointer-events:none;z-index:0;animation:drift 8s ease-in-out infinite alternate}
+    .b1{width:460px;height:460px;background:#ff9aa2;top:-130px;right:-100px;animation-delay:0s}
+    .b2{width:380px;height:380px;background:#c7ceea;bottom:20px;left:-100px;animation-delay:-3s}
+    .b3{width:300px;height:300px;background:#b5ead7;top:40%;left:38%;animation-delay:-5s}
+    @keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(18px,22px) scale(1.06)}}
+
+    /* ── Page ── */
+    .page{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:48px 24px 80px}
+
+    /* ── Header ── */
+    .hero{text-align:center;margin-bottom:48px}
+    .hero-badge{
+      display:inline-block;background:white;border-radius:50px;
+      padding:8px 22px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.82em;
+      color:var(--purple-dk);box-shadow:0 4px 18px rgba(92,107,192,.18);margin-bottom:20px;
+      letter-spacing:.5px;
+    }
+    .hero h1{
+      font-family:'Nunito',sans-serif;font-weight:900;font-size:2.4em;line-height:1.2;
+      margin-bottom:12px;
+    }
+    .grad{
+      background:linear-gradient(135deg,#5c6bc0,#f093fb);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .hero p{color:var(--gray);font-size:.95em;line-height:1.7;max-width:480px;margin:0 auto 24px}
+
+    /* progress strip */
+    .progress-strip{
+      display:inline-flex;align-items:center;gap:8px;
+      background:white;border-radius:50px;padding:10px 22px;
+      box-shadow:0 4px 18px rgba(0,0,0,.08);font-size:.84em;
+    }
+    .progress-strip .ps-num{font-family:'Nunito',sans-serif;font-weight:900;color:var(--purple-dk);font-size:1.1em}
+
+    /* ── Quiz grid ── */
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px;margin-bottom:40px}
+
+    .qcard{
+      background:white;border-radius:24px;padding:28px 18px 22px;
+      text-align:center;cursor:pointer;position:relative;overflow:hidden;
+      box-shadow:0 4px 20px rgba(0,0,0,.07);
+      transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;
+    }
+    .qcard::before{content:'';position:absolute;top:0;left:0;right:0;height:5px}
+    .qcard:hover{transform:translateY(-6px) rotate(.4deg);box-shadow:0 14px 38px rgba(0,0,0,.13)}
+    .c-coral::before  {background:linear-gradient(90deg,#ff9aa2,#ff6b81)}
+    .c-purple::before {background:linear-gradient(90deg,#c7ceea,#5c6bc0)}
+    .c-orange::before {background:linear-gradient(90deg,#ffdac1,#e67e22)}
+    .c-green::before  {background:linear-gradient(90deg,#b5ead7,#27ae60)}
+    .c-gold::before   {background:linear-gradient(90deg,#ffe066,#ffd700)}
+
+    .qcard-icon{font-size:2.8em;margin-bottom:12px;display:block;animation:bob 3s ease-in-out infinite}
+    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+    .qcard:nth-child(2) .qcard-icon{animation-delay:-.8s}
+    .qcard:nth-child(3) .qcard-icon{animation-delay:-1.6s}
+    .qcard:nth-child(4) .qcard-icon{animation-delay:-2.2s}
+
+    .qcard-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:.95em;margin-bottom:6px}
+    .qcard-count{font-size:.76em;color:var(--gray);margin-bottom:10px}
+    .qcard-badge{
+      display:inline-block;padding:4px 13px;border-radius:50px;
+      font-family:'Nunito',sans-serif;font-weight:800;font-size:.72em;
+    }
+    .score-great{background:#edfff5;color:var(--green-dk)}
+    .score-ok   {background:#fffbe6;color:var(--gold-dk)}
+    .score-low  {background:#fff0f0;color:var(--coral-dk)}
+    .score-new  {background:#eef0ff;color:var(--purple-dk)}
+
+    /* ── Info banner ── */
+    .info-banner{
+      background:white;border-radius:20px;padding:20px 26px;
+      box-shadow:0 4px 18px rgba(0,0,0,.06);
+      display:flex;align-items:flex-start;gap:16px;font-size:.86em;line-height:1.65;color:#666;
+    }
+    .info-banner .ib-icon{font-size:1.8em;flex-shrink:0;margin-top:2px}
+
+    /* ── Modal ── */
+    .overlay{
+      display:none;position:fixed;inset:0;z-index:400;
+      background:rgba(45,45,78,.5);backdrop-filter:blur(5px);
+      align-items:center;justify-content:center;padding:16px;
+    }
+    .overlay.open{display:flex}
+    .modal{
+      background:white;border-radius:28px;width:660px;max-width:100%;
+      max-height:92vh;overflow-y:auto;padding:36px 40px;
+      box-shadow:0 28px 90px rgba(0,0,0,.22);position:relative;
+      animation:popIn .25s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes popIn{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
+    .modal-close{
+      position:absolute;top:18px;right:20px;
+      width:36px;height:36px;border-radius:50%;background:#f4f4f8;
+      border:none;cursor:pointer;font-size:1em;display:flex;align-items:center;justify-content:center;
+      transition:background .15s;
+    }
+    .modal-close:hover{background:#e8e8f0}
+
+    /* progress dots */
+    .qdots{display:flex;gap:7px;margin-bottom:24px}
+    .qdot{flex:1;height:6px;border-radius:3px;background:#eee;transition:background .3s}
+    .qdot.done{background:var(--green-dk)}
+    .qdot.cur {background:var(--purple-dk)}
+
+    .q-tag{
+      font-family:'Nunito',sans-serif;font-weight:800;font-size:.72em;
+      text-transform:uppercase;letter-spacing:1.5px;color:var(--gray);margin-bottom:10px;
+    }
+    .q-text{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1em;line-height:1.55;margin-bottom:22px}
+
+    .opts{display:flex;flex-direction:column;gap:10px}
+    .opt{
+      padding:13px 18px;border-radius:14px;border:2px solid #eaeaf5;
+      cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:.88em;
+      text-align:left;background:white;transition:all .15s;
+    }
+    .opt:hover:not([disabled]){border-color:var(--purple-dk);background:#eef0ff;transform:translateX(4px)}
+    .opt.correct{background:#edfff5;border-color:var(--green-dk);color:var(--green-dk)}
+    .opt.wrong  {background:#fff0f0;border-color:var(--coral-dk);color:var(--coral-dk)}
+    .opt.reveal {background:#edfff5;border-color:var(--green-dk)}
+
+    .expl{
+      background:#f8f9ff;border-radius:14px;padding:14px 18px;
+      margin-top:16px;font-size:.84em;line-height:1.68;display:none;
+      border-left:4px solid var(--purple-dk);
+    }
+    .expl.show{display:block;animation:fadeSlide .2s ease}
+    @keyframes fadeSlide{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+    .btn-next{
+      margin-top:20px;padding:12px 30px;border-radius:50px;
+      background:var(--dark);color:white;border:none;
+      font-family:'Nunito',sans-serif;font-weight:800;font-size:.9em;
+      cursor:pointer;display:none;transition:opacity .15s;
+    }
+    .btn-next.show{display:inline-block}
+    .btn-next:hover{opacity:.85}
+
+    /* result */
+    .result{text-align:center;padding:20px 0}
+    .result-emoji{font-size:4.5em;margin-bottom:16px;display:block;animation:bounce .6s ease}
+    @keyframes bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-14px)}}
+    .result-score{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.2em;color:var(--dark)}
+    .result-pct{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.6em;color:var(--purple-dk);margin-top:4px}
+    .result-msg{color:var(--gray);font-size:.92em;margin:12px 0 28px;line-height:1.6;max-width:360px;margin-left:auto;margin-right:auto}
+    .result-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+    .btn-retry{padding:11px 26px;border-radius:50px;border:2px solid var(--dark);background:white;color:var(--dark);font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer}
+    .btn-done {padding:11px 26px;border-radius:50px;border:none;background:var(--dark);color:white;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer}
+
+    /* stars */
+    .stars{display:flex;justify-content:center;gap:4px;margin:14px 0 6px;font-size:1.8em}
+
+    /* all-done banner */
+    .all-done{
+      background:white;border-radius:24px;padding:32px;text-align:center;
+      box-shadow:0 8px 40px rgba(92,107,192,.15);margin-top:10px;
+      border:2px dashed #c7ceea;display:none;
+    }
+    .all-done.show{display:block;animation:fadeSlide .3s ease}
+    .all-done .ad-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.2em;margin-bottom:8px}
+    .all-done .ad-sub{color:var(--gray);font-size:.88em;line-height:1.6}
+
+    @media(max-width:560px){
+      .hero h1{font-size:1.75em}
+      .page{padding:36px 16px 60px}
+      .modal{padding:24px 18px}
+      .grid{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="blob b3"></div>
+
+<div class="page">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">🧫 Gut Microbiome Internship 2026</div>
+    <h1>Quiz <span class="grad">Hub</span> 🎯</h1>
+    <p>Test yourself on what you've learned. Each quiz gives you instant feedback and an explanation — retake as many times as you like!</p>
+    <div class="progress-strip" id="progress-strip">
+      <span>🏆</span>
+      <span id="ps-text">Loading scores...</span>
+    </div>
+  </div>
+
+  <!-- Quiz cards -->
+  <div class="grid" id="grid"></div>
+
+  <!-- All-done banner -->
+  <div class="all-done" id="all-done">
+    <div style="font-size:2.5em;margin-bottom:10px">🎉</div>
+    <div class="ad-title">You've completed all quizzes!</div>
+    <div class="ad-sub">Amazing work. Keep revisiting to reinforce your knowledge.<br>More quizzes will unlock as the internship progresses.</div>
+  </div>
+
+  <!-- Info -->
+  <div class="info-banner">
+    <span class="ib-icon">💡</span>
+    <div>
+      <strong style="color:var(--dark);font-family:'Nunito',sans-serif;font-weight:800">How these quizzes work</strong><br>
+      Click any topic to start. Answer each question and get instant feedback — right or wrong, you'll see an explanation.
+      Your best scores are saved in this browser. Aim for 75%+ on each topic before moving on.
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal -->
+<div class="overlay" id="overlay" onclick="handleOverlay(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="close_()">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  QUIZ DATA — add / edit questions here
+// ═══════════════════════════════════════════════════════
+const QUIZZES = [
+  {
+    id: "gut-basics",
+    title: "Gut Microbiome Basics",
+    icon: "🦠",
+    color: "coral",
+    questions: [
+      {
+        q: "Approximately how many different bacterial species live in a healthy adult gut?",
+        opts: ["10–50 species", "100–200 species", "1,000+ species", "10,000+ species"],
+        ans: 2,
+        exp: "A healthy gut hosts over 1,000 different species, though each person typically has a few hundred dominant ones. Diversity varies significantly between individuals and is influenced by diet, antibiotics, and early-life exposures."
+      },
+      {
+        q: "What are short-chain fatty acids (SCFAs)?",
+        opts: [
+          "Antibodies produced by gut bacteria",
+          "Small molecules produced when bacteria ferment dietary fibre — including butyrate, propionate, and acetate",
+          "Types of bacteria found only in infants",
+          "Fats secreted by the mucus layer"
+        ],
+        ans: 1,
+        exp: "SCFAs are produced when gut bacteria break down dietary fibre that we can't digest. Butyrate is especially important — it feeds colon cells and promotes regulatory T cells that suppress allergic immune responses."
+      },
+      {
+        q: "The hygiene hypothesis proposes that rising allergy rates are partly caused by:",
+        opts: [
+          "Eating too many allergenic foods in early childhood",
+          "Vaccines confusing the immune system",
+          "Reduced early-life microbial exposure, leaving the immune system undertrained",
+          "Genetic mutations becoming more common"
+        ],
+        ans: 2,
+        exp: "The hygiene hypothesis proposes that industrialisation has reduced our contact with the diverse microbes our immune systems co-evolved with — leaving it prone to overreacting to harmless things like food proteins."
+      },
+      {
+        q: "In germ-free mice (raised with no gut bacteria), what happens to the immune system?",
+        opts: [
+          "It becomes stronger — no bacteria means no distractions",
+          "It develops normally but produces more IgE",
+          "It stays underdeveloped, with fewer regulatory T cells and impaired IgA production",
+          "Nothing — it develops independently of bacteria"
+        ],
+        ans: 2,
+        exp: "Germ-free animals have consistently underdeveloped immune systems: fewer Tregs, impaired IgA, and far higher susceptibility to allergy and autoimmune disease. This is direct experimental proof that gut bacteria are essential for immune development."
+      }
+    ]
+  },
+  {
+    id: "bacteria",
+    title: "Key Bacteria",
+    icon: "🔬",
+    color: "purple",
+    questions: [
+      {
+        q: "Which bacterium is called 'the peacekeeper' because it is the gut's main butyrate producer?",
+        opts: ["Akkermansia muciniphila", "Faecalibacterium prausnitzii", "Bacteroides fragilis", "Bifidobacterium longum"],
+        ans: 1,
+        exp: "F. prausnitzii makes up ~5% of all bacteria in a healthy adult gut and is one of its most important butyrate producers. It is consistently lower in patients with IBD, Crohn's disease, and food allergy."
+      },
+      {
+        q: "What does 'muciniphila' mean in Akkermansia muciniphila?",
+        opts: ["Mucus destroyer", "Mucus lover / eater", "Mucus producer", "Resistant to mucus"],
+        ans: 1,
+        exp: "'Mucin' = mucus, 'phila' = lover (Greek). Akkermansia feeds on the mucus layer — but paradoxically stimulates cells to make MORE mucus in response, strengthening the gut barrier rather than destroying it."
+      },
+      {
+        q: "In Feehley et al. 2019, the key bacteria that protected germ-free mice from peanut allergy belonged to which group?",
+        opts: ["Bifidobacterium", "Akkermansia muciniphila", "Clostridiales", "Lactobacillus rhamnosus GG"],
+        ans: 2,
+        exp: "The protective bacteria came from the order Clostridiales — including Lachnospiraceae and Ruminococcaceae. These bacteria colonise the infant gut in the first weeks of life and are critical for immune tolerance."
+      },
+      {
+        q: "What single molecule does Bacteroides fragilis produce that directly trains the immune system?",
+        opts: ["Butyrate", "IgA", "Polysaccharide A (PSA)", "Mucin"],
+        ans: 2,
+        exp: "PSA is unique to B. fragilis. Sarkis Mazmanian's lab showed that PSA alone can rescue immune defects in germ-free mice — specifically by promoting regulatory T cell development and correcting Th1/Th2 imbalances."
+      },
+      {
+        q: "Why is Bifidobacterium infantis uniquely suited to the infant gut?",
+        opts: [
+          "It produces the highest amount of butyrate of any gut bacterium",
+          "It has unique genes for digesting human milk oligosaccharides (HMOs) in breast milk",
+          "It is the largest bacterium in the infant gut",
+          "It produces antibodies that protect against infection"
+        ],
+        ans: 1,
+        exp: "B. infantis carries a unique gene cluster for breaking down HMOs — complex sugars in breast milk that the baby itself cannot digest. Breast milk essentially 'feeds the bacteria', not just the baby. This specialised relationship is millions of years old."
+      }
+    ]
+  },
+  {
+    id: "dna",
+    title: "DNA & Sequencing",
+    icon: "🧬",
+    color: "green",
+    questions: [
+      {
+        q: "DNA is made of 4 chemical bases. Which set is correct?",
+        opts: ["A, T, G, C", "A, U, G, C", "A, T, G, P", "A, B, G, C"],
+        ans: 0,
+        exp: "DNA uses Adenine (A), Thymine (T), Guanine (G), and Cytosine (C). RNA uses Uracil (U) instead of Thymine. This 4-letter alphabet encodes all genetic information."
+      },
+      {
+        q: "What is a FASTQ file?",
+        opts: [
+          "A database of all known bacterial species",
+          "A text file storing DNA sequences plus a quality score for every base",
+          "A compressed gel image",
+          "A MetaPhlAn4 abundance report"
+        ],
+        ans: 1,
+        exp: "FASTQ is the standard format for raw sequencing output. Each read has 4 lines: (1) sequence ID, (2) the DNA sequence, (3) a '+' separator, (4) Phred quality scores — one ASCII character per base."
+      },
+      {
+        q: "A Phred quality score of Q30 means:",
+        opts: [
+          "30% accuracy — the base is probably wrong",
+          "1 error in 30 bases",
+          "1 error in 1,000 bases (99.9% accuracy)",
+          "The read is 30 bases long"
+        ],
+        ans: 2,
+        exp: "Phred scores are logarithmic: Q30 = 99.9% accuracy (1 error per 1,000 bases). Q20 = 99%, Q40 = 99.99%. In metagenomics QC we typically require bases at Q≥20 before trusting them."
+      },
+      {
+        q: "Shotgun metagenomics sequences everything at once. What new problem does this create?",
+        opts: [
+          "The sequencer needs to run longer",
+          "We don't know which species each read came from — we need computational tools to classify them",
+          "We need RNA instead of DNA",
+          "Quality scores become less reliable"
+        ],
+        ans: 1,
+        exp: "When sequencing all DNA simultaneously, millions of short reads come from dozens of organisms. Tools like MetaPhlAn4 compare each read to a reference database to classify its source organism — a computational challenge that doesn't exist when sequencing one genome."
+      }
+    ]
+  },
+  {
+    id: "pipeline",
+    title: "Metagenomics Pipeline",
+    icon: "⚙️",
+    color: "orange",
+    questions: [
+      {
+        q: "What is the main purpose of KneadData in the bioBakery pipeline?",
+        opts: [
+          "Count how many bacteria are in each sample",
+          "Remove human DNA contamination from gut samples",
+          "Identify active metabolic pathways",
+          "Align reads to a bacterial reference"
+        ],
+        ans: 1,
+        exp: "Gut samples contain both microbial and human DNA (from shed gut cells). KneadData aligns reads to the human genome and removes matches. Without this, human sequences contaminate the microbial analysis."
+      },
+      {
+        q: "MetaPhlAn4 tells us which bacteria are present. What type of output does it give?",
+        opts: [
+          "Raw DNA sequences",
+          "A list of active metabolic pathways",
+          "Relative abundance of each species — e.g. F. prausnitzii: 4.7%",
+          "Phred quality scores"
+        ],
+        ans: 2,
+        exp: "MetaPhlAn4 uses clade-specific marker genes to identify species and estimate their relative abundance. This composition profile — who is present and in what proportion — is what we compare between allergy cases and healthy controls."
+      },
+      {
+        q: "Alpha diversity measures diversity within one sample. Beta diversity measures:",
+        opts: [
+          "Total species count across all samples",
+          "How different the microbial compositions are between samples",
+          "Average abundance of one bacterium across all samples",
+          "Sequencing depth per sample"
+        ],
+        ans: 1,
+        exp: "Beta diversity compares microbial communities between samples. High beta diversity between two groups (e.g. allergy vs. healthy) means their microbiomes look very different. PCoA plots visualise this — similar samples cluster together."
+      },
+      {
+        q: "MaAsLin2, used in Week 3, does what?",
+        opts: [
+          "Aligns raw reads to a reference genome",
+          "Compresses FASTQ files for storage",
+          "Finds which bacteria are statistically associated with food allergy, adjusting for confounders",
+          "Measures sequencing quality"
+        ],
+        ans: 2,
+        exp: "MaAsLin2 (Multivariate Association with Linear Models) tests associations between microbiome features and metadata (e.g. allergy status, age, diet). It adjusts for confounding variables so you identify bacteria genuinely linked to food allergy, not just correlated by chance."
+      }
+    ]
+  }
+]
+
+// ═══════════════════════════════════════════════════════
+//  ENGINE
+// ═══════════════════════════════════════════════════════
+const store = JSON.parse(localStorage.getItem('quiz_hub') || '{}')
+const save  = () => localStorage.setItem('quiz_hub', JSON.stringify(store))
+let state   = null
+
+// render cards
+function renderGrid() {
+  const attempted = QUIZZES.filter(q => store[q.id] !== undefined).length
+  const psText    = document.getElementById('ps-text')
+  if (attempted === 0) {
+    psText.textContent = 'No quizzes completed yet — pick one to start!'
+  } else if (attempted === QUIZZES.length) {
+    psText.textContent = `All ${QUIZZES.length} quizzes done! 🎉`
+    document.getElementById('all-done').classList.add('show')
+  } else {
+    psText.textContent = `${attempted} / ${QUIZZES.length} topics attempted`
+  }
+
+  document.getElementById('grid').innerHTML = QUIZZES.map(q => {
+    const best = store[q.id]
+    const pct  = best !== undefined ? Math.round(best * 100 / q.questions.length) : null
+    let badge  = `<span class="qcard-badge score-new">Start ›</span>`
+    if (pct !== null) {
+      const cls = pct >= 75 ? 'score-great' : pct >= 50 ? 'score-ok' : 'score-low'
+      const lbl = pct >= 75 ? `${pct}% ★ Great!` : pct >= 50 ? `${pct}% Keep going` : `${pct}% Try again`
+      badge = `<span class="qcard-badge ${cls}">${lbl}</span>`
+    }
+    return `<div class="qcard c-${q.color}" onclick="start('${q.id}')">
+      <span class="qcard-icon">${q.icon}</span>
+      <div class="qcard-title">${q.title}</div>
+      <div class="qcard-count">${q.questions.length} questions</div>
+      ${badge}
+    </div>`
+  }).join('')
+}
+
+// quiz flow
+function start(id) {
+  state = { quiz: QUIZZES.find(q => q.id===id), cur: 0, score: 0, answered: false }
+  document.getElementById('overlay').classList.add('open')
+  renderQ()
+}
+
+function close_() {
+  document.getElementById('overlay').classList.remove('open')
+  state = null
+  renderGrid()
+}
+
+function handleOverlay(e) { if (e.target.id==='overlay') close_() }
+
+function renderQ() {
+  const { quiz, cur } = state
+  const q = quiz.questions[cur]
+  document.getElementById('modal-body').innerHTML = `
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1em;margin-bottom:10px">${quiz.icon} ${quiz.title}</div>
+    <div class="qdots">${quiz.questions.map((_,i)=>`<div class="qdot ${i<cur?'done':i===cur?'cur':''}"></div>`).join('')}</div>
+    <div class="q-tag">Question ${cur+1} of ${quiz.questions.length}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="opts">${q.opts.map((o,i)=>`<button class="opt" id="o${i}" onclick="pick(${i})">${o}</button>`).join('')}</div>
+    <div class="expl" id="expl">${q.exp}</div>
+    <button class="btn-next" id="bnxt" onclick="next()">${cur+1<quiz.questions.length?'Next question →':'See my results →'}</button>
+  `
+}
+
+function pick(idx) {
+  if (state.answered) return
+  state.answered = true
+  const q = state.quiz.questions[state.cur]
+  document.querySelectorAll('.opt').forEach((b,i) => {
+    b.disabled = true
+    if (i===q.ans) b.classList.add('correct')
+    else if (i===idx) b.classList.add('wrong')
+  })
+  if (idx===q.ans) state.score++
+  document.getElementById('expl').classList.add('show')
+  document.getElementById('bnxt').classList.add('show')
+}
+
+function next() {
+  state.cur++
+  state.answered = false
+  if (state.cur >= state.quiz.questions.length) showResult()
+  else renderQ()
+}
+
+function showResult() {
+  const { quiz, score } = state
+  const total = quiz.questions.length
+  const pct   = Math.round(score*100/total)
+  const emoji = pct>=75?'🎉':pct>=50?'👍':'💪'
+  const stars = pct>=75?'★★★':pct>=50?'★★☆':'★☆☆'
+  const msg   = pct>=75
+    ? 'Excellent! You really understand this material.'
+    : pct>=50
+    ? 'Good effort — review the explanations and try again to get above 75%.'
+    : 'Keep studying! Read through the explanations and retake the quiz.'
+  const prev = store[quiz.id]
+  if (prev===undefined || score>prev) { store[quiz.id]=score; save() }
+  document.getElementById('modal-body').innerHTML = `
+    <div class="result">
+      <span class="result-emoji">${emoji}</span>
+      <div class="stars">${stars.split('').map(s=>`<span style="color:${s==='★'?'#ffd700':'#ddd'}">${s}</span>`).join('')}</div>
+      <div class="result-score">${score} / ${total}</div>
+      <div class="result-pct">${pct}%</div>
+      <div class="result-msg">${msg}</div>
+      <div class="result-btns">
+        <button class="btn-retry" onclick="start('${quiz.id}')">Try again 🔄</button>
+        <button class="btn-done"  onclick="close_()">Back to quizzes</button>
+      </div>
+    </div>`
+}
+
+renderGrid()
+</script>
+</body>
+</html>
