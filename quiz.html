@@ -175,6 +175,10 @@
     /* stars */
     .stars{display:flex;justify-content:center;gap:4px;margin:14px 0 6px;font-size:1.8em}
 
+    /* open-question textarea */
+    .op-area{width:100%;min-height:82px;padding:11px 14px;border-radius:12px;border:2px solid #eaeaf5;font-family:'Nunito Sans',sans-serif;font-size:.88em;line-height:1.5;resize:vertical;transition:border-color .15s}
+    .op-area:focus{outline:none;border-color:var(--purple-dk)}
+
     /* all-done banner */
     .all-done{
       background:white;border-radius:24px;padding:32px;text-align:center;
@@ -291,6 +295,17 @@ const QUIZZES = [
         ],
         ans: 2,
         exp: "Germ-free animals have consistently underdeveloped immune systems: fewer Tregs, impaired IgA, and far higher susceptibility to allergy and autoimmune disease. This is direct experimental proof that gut bacteria are essential for immune development."
+      },
+      {
+        q: "Which of these most strongly REDUCES gut microbiome diversity, especially in early life?",
+        opts: [
+          "Eating a variety of fibre-rich vegetables",
+          "A course of broad-spectrum antibiotics",
+          "Being breastfed as an infant",
+          "Playing outdoors and contact with animals"
+        ],
+        ans: 1,
+        exp: "Broad-spectrum antibiotics wipe out many bacterial species at once, sharply lowering diversity. The other three all tend to INCREASE diversity. Early-life antibiotic use is one of the environmental factors linked to higher allergy risk in the hygiene hypothesis."
       }
     ]
   },
@@ -381,6 +396,17 @@ const QUIZZES = [
         ],
         ans: 1,
         exp: "When sequencing all DNA simultaneously, millions of short reads come from dozens of organisms. Tools like MetaPhlAn4 compare each read to a reference database to classify its source organism — a computational challenge that doesn't exist when sequencing one genome."
+      },
+      {
+        q: "In shotgun metagenomics of a stool sample, which molecule do we actually extract and sequence?",
+        opts: [
+          "Proteins from the bacteria",
+          "All of the DNA in the sample (bacterial + human)",
+          "Only RNA from living bacteria",
+          "The mucus layer of the gut"
+        ],
+        ans: 1,
+        exp: "We extract total DNA from everything in the sample — that includes bacterial DNA AND human DNA shed from gut cells. This is exactly why the first pipeline step (KneadData) has to remove the human DNA before we analyse the bacteria."
       }
     ]
   },
@@ -433,10 +459,36 @@ const QUIZZES = [
         ],
         ans: 2,
         exp: "MaAsLin2 (Multivariate Association with Linear Models) tests associations between microbiome features and metadata (e.g. allergy status, age, diet). It adjusts for confounding variables so you identify bacteria genuinely linked to food allergy, not just correlated by chance."
+      },
+      {
+        q: "MetaPhlAn4 tells us WHO is there. HUMAnN3 answers a different question — which one?",
+        opts: [
+          "How many human reads are in the sample",
+          "What the bacteria can DO — which metabolic pathways and functions are present",
+          "The Phred quality of each read",
+          "Which samples cluster together"
+        ],
+        ans: 1,
+        exp: "HUMAnN3 does functional profiling: instead of just 'who is present', it estimates which genes and metabolic pathways the community carries — e.g. the capacity to produce butyrate. Taxonomy (MetaPhlAn4) + function (HUMAnN3) together give a much fuller picture."
       }
     ]
   }
 ]
+
+// ═══════════════════════════════════════════════════════
+//  OPEN QUESTIONS — free response, no auto-grading
+//  Answers save in the browser; student emails them to mentor.
+// ═══════════════════════════════════════════════════════
+const MENTOR_EMAIL = "jason17@connect.hku.hk"   // ← change if needed
+const OPEN = [
+  "In your own words, explain the hygiene hypothesis to a friend who knows no biology. Why might it help explain rising food allergy rates?",
+  "Faecalibacterium prausnitzii and the Clostridiales are both butyrate producers linked to allergy protection. Design a simple experiment to test whether butyrate ITSELF is the protective factor. What would your control group be?",
+  "We know some bacteria (like Clostridiales) protect against food allergy. Why can't we just give them to every newborn to prevent allergy? Give at least two reasons.",
+  "Walk through the journey of a stool sample — from collection all the way to a table of species abundances. Name each step and say what it does.",
+  "Suppose our cohort analysis finds F. prausnitzii is lower in food-allergic children. Does that PROVE it causes allergy? Explain, and describe what evidence would be needed to show causation."
+]
+const openStore = JSON.parse(localStorage.getItem('quiz_hub_open') || '{}')
+const persistOpen = () => localStorage.setItem('quiz_hub_open', JSON.stringify(openStore))
 
 // ═══════════════════════════════════════════════════════
 //  ENGINE
@@ -474,6 +526,42 @@ function renderGrid() {
       ${badge}
     </div>`
   }).join('')
+
+  // Open Questions card (free response)
+  const written = OPEN.filter((_,i) => (openStore[i]||'').trim()).length
+  const oBadge = written===0 ? `<span class="qcard-badge score-new">Start ›</span>`
+    : written===OPEN.length ? `<span class="qcard-badge score-great">All ${OPEN.length} written ✎</span>`
+    : `<span class="qcard-badge score-ok">${written}/${OPEN.length} written</span>`
+  document.getElementById('grid').innerHTML += `<div class="qcard c-gold" onclick="startOpen()">
+    <span class="qcard-icon">🧠</span>
+    <div class="qcard-title">Open Questions</div>
+    <div class="qcard-count">${OPEN.length} to reflect on</div>
+    ${oBadge}
+  </div>`
+}
+
+// open-question flow
+function startOpen() {
+  document.getElementById('overlay').classList.add('open')
+  document.getElementById('modal-body').innerHTML = `
+    <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05em;margin-bottom:6px">🧠 Open Questions</div>
+    <div style="color:var(--gray);font-size:.85em;margin-bottom:20px;line-height:1.6">No right or wrong answers — these are for thinking and discussion. Your answers save automatically in this browser. When you're ready, send them to your mentor.</div>
+    ${OPEN.map((q,i)=>`
+      <div style="margin-bottom:18px">
+        <div class="q-text" style="font-size:.95em;margin-bottom:10px">${i+1}. ${q}</div>
+        <textarea id="op${i}" class="op-area" placeholder="Type your answer..."
+          oninput="openStore[${i}]=this.value;persistOpen()">${(openStore[i]||'').replace(/</g,'&lt;')}</textarea>
+      </div>`).join('')}
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+      <button class="btn-done"  onclick="emailOpen()">📧 Send to mentor</button>
+      <button class="btn-retry" onclick="close_()">Done for now</button>
+    </div>
+    <div style="margin-top:12px;font-size:.8em;color:var(--gray)">💾 Answers save as you type.</div>`
+}
+
+function emailOpen() {
+  const body = OPEN.map((q,i)=>`Q${i+1}: ${q}\n\nA${i+1}: ${(openStore[i]||'(not answered)')}\n\n----------\n`).join('\n')
+  window.location.href = `mailto:${MENTOR_EMAIL}?subject=${encodeURIComponent('[Internship] My open-question answers')}&body=${encodeURIComponent(body)}`
 }
 
 // quiz flow

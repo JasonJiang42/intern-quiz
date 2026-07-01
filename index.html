@@ -229,7 +229,7 @@
 <section class="section active" id="sec-home">
   <div class="home-hero">
     <span class="home-emoji">🧫</span>
-    <div class="home-title">Welcome, <span class="grad" id="hero-name">Ruotong Li</span>!</div>
+    <div class="home-title">Welcome, <span class="grad" id="hero-name">Intern</span>!</div>
     <p class="home-sub">Everything you need for your 3-week gut microbiome internship is right here. Check your daily tasks, test yourself on quizzes, and ask your mentor anything.</p>
   </div>
 
@@ -320,8 +320,8 @@
 const DATA = {
 
   // ── Basic info ────────────────────────────────────────────────────────
-  student:      { name: "Intern" },          // ← change to student's name
-  mentor_email: "jason17@connect.hku.hk",            // ← change to your email
+  student:      { name: "Ruotong Li" },      // ← change to student's name
+  mentor_email: "jason17@connect.hku.hk",    // ← change to your email
   quiz_url:     "quiz.html",                 // quiz page (keep as-is)
 
   // ── Weekly schedule ───────────────────────────────────────────────────
@@ -368,42 +368,41 @@ const DATA = {
           mission:"Complete 3 Species Cards and answer at least 8 questions from key_gut_bacteria.md."
         },
         {
-          id:3, color:"orange",
-          title:"Cohorts, Papers & Research Design",
-          pills:["Case-Control","Cohort Study","Reading Papers"],
+          id:3, color:"green",
+          title:"DNA & Sequencing",
+          pills:["DNA","Bases","FASTQ","Phred Quality"],
           objectives:[
-            "Understand what a case-control study is",
-            "Learn how to read a scientific paper (abstract + figures only)",
-            "Understand what our food allergy cohort looks like"
-          ],
-          tasks:[
-            {type:"read",  label:"Feehley et al. 2019 — abstract + Figure 1 + Figure 3 only", url:"https://doi.org/10.1038/s41591-018-0324-z"},
-            {type:"read",  label:"Arrieta et al. 2015 — abstract + Figure 1 only", url:"https://doi.org/10.1126/scitranslmed.aab2271"},
-            {type:"watch", label:"TED-Ed: What is a food allergy? (~5 min)", url:"https://www.youtube.com/results?search_query=TED-Ed+food+allergy+Eleanor+Nelsen"},
-            {type:"write", label:"Lab notebook: 1-sentence summary for each paper"},
-            {type:"write", label:"Draw the cohort: cases vs controls, what we collect, what we measure"},
-            {type:"think", label:"How would you design a study on food allergy and gut bacteria?"}
-          ],
-          mission:"Explain the Feehley 2019 study out loud — what they did, found, and why it matters. No reading."
-        },
-        {
-          id:4, color:"green",
-          title:"DNA, Sequencing & Metagenomics",
-          pills:["DNA","FASTQ","Shotgun Sequencing","Metagenomics"],
-          objectives:[
-            "Understand the structure of DNA and how genetic information is encoded",
-            "Learn how shotgun metagenomics works step by step",
-            "Read a FASTQ file and understand what each line means"
+            "Understand the structure of DNA and how the 4 bases encode information",
+            "Learn how modern (Illumina) sequencing turns DNA into digital reads",
+            "Read a FASTQ file — know what each of the 4 lines means and what a quality score is"
           ],
           tasks:[
             {type:"watch",   label:"TED-Ed: What is DNA? (~5 min)", url:"https://www.youtube.com/results?search_query=TED-Ed+what+is+DNA+and+how+does+it+work"},
-            {type:"watch",   label:"Shotgun metagenomics explained (~5–8 min)", url:"https://www.youtube.com/results?search_query=shotgun+metagenomics+explained"},
             {type:"watch",   label:"Illumina sequencing by synthesis (~5 min)", url:"https://www.youtube.com/results?search_query=Illumina+sequencing+by+synthesis"},
-            {type:"practice",label:"Open an example .fastq file — identify the 4 lines of one read and explain each"},
-            {type:"write",   label:"Draw the pipeline: stool sample → DNA → sequence → FASTQ → what next?"},
-            {type:"think",   label:"Why can't we just grow bacteria instead of sequencing them?"}
+            {type:"read",    label:"Quick reference: FASTQ format (4 lines) and Phred scores (Q20 = 99%, Q30 = 99.9%)"},
+            {type:"practice",label:"Open an example .fastq file — find one read, identify all 4 lines and explain each"},
+            {type:"write",   label:"Lab notebook: draw a DNA strand and label the 4 bases (A, T, G, C)"},
+            {type:"think",   label:"Why do we need a quality score for every single base? What could go wrong without it?"}
           ],
-          mission:"Explain in your own words: what is in a FASTQ file and why do we need sequencing to study the gut microbiome?"
+          mission:"Explain in your own words what is inside a FASTQ file, and what a Q30 quality score means."
+        },
+        {
+          id:4, color:"orange",
+          title:"Metagenomics & the Pipeline",
+          pills:["Shotgun Metagenomics","bioBakery","MetaPhlAn4","Abundance"],
+          objectives:[
+            "Understand what shotgun metagenomics is and how it differs from sequencing one bacterium",
+            "See the full journey: stool sample → DNA → reads → who is present, in what amount",
+            "Get a first look at the bioBakery pipeline steps you'll run in Week 2"
+          ],
+          tasks:[
+            {type:"watch",   label:"Shotgun metagenomics explained (~5–8 min)", url:"https://www.youtube.com/results?search_query=shotgun+metagenomics+explained"},
+            {type:"read",    label:"Pipeline preview: KneadData → MetaPhlAn4 → HUMAnN3 → MaAsLin2 (what each step does)"},
+            {type:"write",   label:"Draw the pipeline: stool sample → extract DNA → sequence → FASTQ → clean → classify → abundance table"},
+            {type:"think",   label:"Why can't we just grow the bacteria in a dish instead of sequencing them?"},
+            {type:"think",   label:"If all species are sequenced at once, how do we tell which read came from which bacterium?"}
+          ],
+          mission:"Walk your mentor through the whole pipeline out loud — from stool sample to a table of species abundances."
         },
         {
           id:5, color:"gold",
@@ -432,10 +431,11 @@ const DATA = {
   // ── Quiz topics (cards + scores; clicking opens quiz.html) ────────────
   // The `id` must match the quiz id in quiz.html.
   quizTopics:[
-    {id:"gut-basics", title:"Gut Microbiome Basics", icon:"🦠", color:"coral",  questions:4},
+    {id:"gut-basics", title:"Gut Microbiome Basics", icon:"🦠", color:"coral",  questions:5},
     {id:"bacteria",   title:"Key Bacteria",           icon:"🔬", color:"purple", questions:5},
-    {id:"dna",        title:"DNA & Sequencing",       icon:"🧬", color:"green",  questions:4},
-    {id:"pipeline",   title:"Metagenomics Pipeline",  icon:"⚙️", color:"orange", questions:4}
+    {id:"dna",        title:"DNA & Sequencing",       icon:"🧬", color:"green",  questions:5},
+    {id:"pipeline",   title:"Metagenomics Pipeline",  icon:"⚙️", color:"orange", questions:5},
+    {id:"open",       title:"Open Questions",         icon:"🧠", color:"gold",   questions:5, open:true}
   ],
 
   // ── Q&A ──────────────────────────────────────────────────────────────
