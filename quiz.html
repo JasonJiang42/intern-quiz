@@ -685,6 +685,249 @@ const QUIZZES = [
         exp: "HUMAnN3 does functional profiling: instead of just 'who is present', it estimates which genes and metabolic pathways the community carries — e.g. the capacity to produce butyrate. Taxonomy (MetaPhlAn4) + function (HUMAnN3) together give a much fuller picture."
       }
     ]
+  },
+  {
+    id: "bash",
+    title: "Bash & Scripting",
+    icon: "⌨️",
+    color: "green",
+    questions: [
+      {
+        q: "What is a shell (bash) script?",
+        opts: [
+          "A text file containing commands the computer runs top to bottom",
+          "A type of bacteria",
+          "A photo of your screen",
+          "A spreadsheet"
+        ],
+        ans: 0,
+        exp: "A script is just a plain text file of commands. Instead of typing them one by one, you save them and run them all at once — repeatable and error-free."
+      },
+      {
+        q: "Which command prints text to the screen in bash?",
+        opts: ["print", "echo", "say", "show"],
+        ans: 1,
+        exp: "echo prints text, e.g.  echo \"Hello\"  displays Hello. It's the most common way to see output or debug a script."
+      },
+      {
+        q: "How do you store a value in a variable in bash?",
+        opts: [
+          "NAME = value  (with spaces)",
+          "NAME=value  (no spaces around the =)",
+          "var NAME = value",
+          "let NAME := value"
+        ],
+        ans: 1,
+        exp: "In bash there are NO spaces around the = sign:  NAME=\"Ruotong\"  is correct;  NAME = ...  gives an error."
+      },
+      {
+        q: "How do you use the value stored in a variable called NAME?",
+        opts: ["NAME", "$NAME", "&NAME", "get(NAME)"],
+        ans: 1,
+        exp: "Put a $ in front:  echo \"Hello $NAME\"  prints the value stored in NAME."
+      },
+      {
+        q: "What does  chmod +x script.sh  do?",
+        opts: [
+          "Deletes the script",
+          "Makes the script executable (allowed to run)",
+          "Opens it in a browser",
+          "Renames it"
+        ],
+        ans: 1,
+        exp: "chmod +x gives the file 'execute' permission, so you're allowed to run it as a program with ./script.sh."
+      },
+      {
+        q: "How do you run a script called script.sh that is in your current folder?",
+        opts: ["run script.sh", "./script.sh", "open script.sh", "script"],
+        ans: 1,
+        exp: "./ means 'in the current folder'. So  ./script.sh  runs the script sitting right here."
+      },
+      {
+        q: "What does a  for  loop do?",
+        opts: [
+          "Runs commands once",
+          "Repeats commands for each item in a list",
+          "Stops the script",
+          "Deletes files"
+        ],
+        ans: 1,
+        exp: "A for loop repeats the same commands for every item — perfect for processing many samples without copy-pasting."
+      },
+      {
+        q: "In  for f in *.fastq; do echo $f; done , what does  *.fastq  match?",
+        opts: [
+          "Only a file literally named star.fastq",
+          "Every file in the folder whose name ends in .fastq",
+          "Nothing",
+          "All folders"
+        ],
+        ans: 1,
+        exp: "The * is a wildcard meaning 'anything', so *.fastq matches all files ending in .fastq. The loop then runs once per sample file."
+      }
+    ]
+  },
+  {
+    id: "hpc",
+    title: "HPC & SLURM",
+    icon: "🖥️",
+    color: "purple",
+    questions: [
+      {
+        q: "What is an HPC (high-performance computing) cluster?",
+        opts: [
+          "A single very fast laptop",
+          "Many connected computers (nodes) that share big computing jobs",
+          "A cloud photo storage service",
+          "A type of database"
+        ],
+        ans: 1,
+        exp: "A cluster is many computers ('nodes') linked together so large jobs can run far faster than on one machine."
+      },
+      {
+        q: "What is the LOGIN node mainly for?",
+        opts: [
+          "Running the heaviest analysis",
+          "Typing commands and preparing/submitting jobs (light work)",
+          "Storing photos",
+          "Nothing"
+        ],
+        ans: 1,
+        exp: "The login node is your entry point for editing scripts and submitting jobs. You should NOT run heavy analysis directly on it."
+      },
+      {
+        q: "Where does the heavy analysis actually run?",
+        opts: ["On the login node", "On the compute nodes", "On your phone", "In your email"],
+        ans: 1,
+        exp: "Big jobs run on the compute nodes, which have lots of CPU and memory. The scheduler sends your job there."
+      },
+      {
+        q: "What is SLURM?",
+        opts: [
+          "A sequencing machine",
+          "A job scheduler that queues jobs and runs them on free nodes",
+          "A bacterium",
+          "A file format"
+        ],
+        ans: 1,
+        exp: "SLURM is the scheduler that manages everyone's jobs, deciding what runs where and when so resources are shared fairly."
+      },
+      {
+        q: "Which command submits a job script to SLURM?",
+        opts: ["run", "sbatch", "bash", "start"],
+        ans: 1,
+        exp: "sbatch myjob.sh submits the script to the queue. (Running it with bash instead would run it on the login node — a common mistake!)"
+      },
+      {
+        q: "Which command shows your queued and running jobs?",
+        opts: ["ls", "squeue", "jobs.txt", "top"],
+        ans: 1,
+        exp: "squeue -u <yourname> lists your jobs and their status (pending, running, etc.)."
+      },
+      {
+        q: "In an sbatch script, what does  #SBATCH --cpus-per-task=8  set?",
+        opts: [
+          "The number of CPU cores the job gets",
+          "How many emails to send",
+          "The file name",
+          "The bacterial species"
+        ],
+        ans: 0,
+        exp: "#SBATCH lines request resources. --cpus-per-task=8 asks for 8 CPU cores. Others set memory, time limit, and which partition to use."
+      },
+      {
+        q: "Why submit jobs through the scheduler instead of running them straight on the login node?",
+        opts: [
+          "It looks cooler",
+          "To share resources fairly and avoid overloading the shared login node",
+          "It changes your DNA data",
+          "There is no reason"
+        ],
+        ans: 1,
+        exp: "The login node is shared by everyone. Big jobs belong on compute nodes via the scheduler, so one person can't freeze the machine for all."
+      }
+    ]
+  },
+  {
+    id: "analysis",
+    title: "Running the Pipeline",
+    icon: "🧪",
+    color: "coral",
+    questions: [
+      {
+        q: "Which tool is the FIRST pipeline step — cleaning reads and removing human DNA?",
+        opts: ["MetaPhlAn4", "KneadData", "HUMAnN3", "MaAsLin2"],
+        ans: 1,
+        exp: "KneadData runs first: it trims low-quality bases and removes human reads so only clean microbial data moves on."
+      },
+      {
+        q: "Which tool tells you WHICH species are present in a sample?",
+        opts: ["KneadData", "MetaPhlAn4", "HUMAnN3", "sbatch"],
+        ans: 1,
+        exp: "MetaPhlAn4 does taxonomic profiling — it reports which species are present and their relative abundance."
+      },
+      {
+        q: "Which tool tells you what the bacteria can DO (their metabolic pathways)?",
+        opts: ["MetaPhlAn4", "HUMAnN3", "KneadData", "squeue"],
+        ans: 1,
+        exp: "HUMAnN3 does functional profiling — the community's genes and pathways, e.g. capacity to make butyrate."
+      },
+      {
+        q: "Why do we remove human DNA before profiling the bacteria?",
+        opts: [
+          "Human DNA makes the file prettier",
+          "It would contaminate and distort the microbial results",
+          "It speeds up the internet",
+          "We never remove it"
+        ],
+        ans: 1,
+        exp: "Stool contains human DNA from shed gut cells. Left in, it contaminates the analysis, so KneadData filters it out first."
+      },
+      {
+        q: "The main output of MetaPhlAn4 is:",
+        opts: [
+          "Raw FASTQ reads",
+          "A table of species and their relative abundance (e.g. F. prausnitzii: 4.7%)",
+          "A photo",
+          "A list of Phred scores"
+        ],
+        ans: 1,
+        exp: "MetaPhlAn4 outputs an abundance table — who is present and in what proportion — which we compare between groups."
+      },
+      {
+        q: "Why do we MERGE the result tables from many samples into one table?",
+        opts: [
+          "To delete data",
+          "So we can compare all samples side by side in a single table",
+          "To make files bigger for fun",
+          "Merging is not allowed"
+        ],
+        ans: 1,
+        exp: "One merged table (samples as columns) lets us compare across all samples and feed the data into Week 3's statistics."
+      },
+      {
+        q: "Running a big analysis step as an sbatch job means it:",
+        opts: [
+          "Runs on the login node",
+          "Runs on a compute node through the scheduler",
+          "Runs on your phone",
+          "Does not run"
+        ],
+        ans: 1,
+        exp: "Heavy steps (KneadData, MetaPhlAn4, HUMAnN3) are submitted with sbatch so they run on powerful compute nodes, not the login node."
+      },
+      {
+        q: "Put the pipeline in the correct order:",
+        opts: [
+          "MetaPhlAn4 → KneadData → HUMAnN3",
+          "KneadData → MetaPhlAn4 → HUMAnN3 → (Week 3: MaAsLin2)",
+          "HUMAnN3 → KneadData → MetaPhlAn4",
+          "MaAsLin2 → MetaPhlAn4 → KneadData"
+        ],
+        ans: 1,
+        exp: "Clean (KneadData) → who's there (MetaPhlAn4) → what they do (HUMAnN3) → then in Week 3, associations with allergy (MaAsLin2)."
+      }
+    ]
   }
 ]
 

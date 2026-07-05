@@ -238,9 +238,9 @@
       <div class="wk-label">Week 1 🌟</div>
       <div class="wk-desc">Foundations<br>Gut microbiome, immunity, DNA &amp; Linux</div>
     </div>
-    <div class="wk-card wk2 locked">
+    <div class="wk-card wk2">
       <div class="wk-label">Week 2 🔬</div>
-      <div class="wk-desc">Bioinformatics<br>KneadData → MetaPhlAn4 → HUMAnN3</div>
+      <div class="wk-desc">Scripting &amp; HPC<br>Bash, SLURM &amp; running the pipeline</div>
     </div>
     <div class="wk-card wk3 locked">
       <div class="wk-label">Week 3 📊</div>
@@ -425,7 +425,106 @@ const DATA = {
         }
       ]
     },
-    {id:2, title:"Week 2", subtitle:"Bioinformatics Pipeline", locked:true, days:[]},
+    {
+      id:2, title:"Week 2", subtitle:"Scripting, HPC & Analysis", locked:false,
+      days:[
+        {
+          id:1, color:"green",
+          title:"Bash Scripting Basics",
+          pills:["Bash","Variables","Loops","Scripts"],
+          objectives:[
+            "Understand what a shell script is and why we use scripts instead of typing commands one by one",
+            "Learn bash basics: variables, echo, and a simple for loop",
+            "Write, save, make executable, and run your own script"
+          ],
+          tasks:[
+            {type:"watch",   label:"Bash scripting for beginners (~15 min)", url:"https://www.youtube.com/results?search_query=bash+scripting+for+beginners+tutorial"},
+            {type:"read",    label:"A script is just a text file of commands the computer runs top to bottom"},
+            {type:"practice",label:"Write hello.sh that prints a message; make it runnable with chmod +x hello.sh; run it with ./hello.sh"},
+            {type:"practice",label:"Use a variable:  NAME=\"Ruotong\"  then  echo \"Hello $NAME\""},
+            {type:"practice",label:"Write a loop that prints every file:  for f in *; do echo $f; done"},
+            {type:"think",   label:"Why is a script better than typing the same 20 commands over and over?"}
+          ],
+          mission:"Write and run a script that loops over a folder and prints each filename."
+        },
+        {
+          id:2, color:"purple",
+          title:"Meet the HPC Server",
+          pills:["HPC","SSH","Login vs Compute","Conda"],
+          objectives:[
+            "Understand what an HPC cluster is, and the difference between the login node and the compute nodes",
+            "Log in with SSH and navigate the storage folders",
+            "Activate a conda environment and find where the analysis tools live"
+          ],
+          tasks:[
+            {type:"watch",   label:"What is high-performance computing / a compute cluster? (~8 min)", url:"https://www.youtube.com/results?search_query=what+is+high+performance+computing+cluster+explained"},
+            {type:"read",    label:"Login node = where you type commands and prepare jobs (has internet). Compute nodes = where big jobs actually run (no internet)."},
+            {type:"practice",label:"SSH into the server with your mentor:  ssh username@server"},
+            {type:"explore", label:"Explore storage: ls the shared project folder and the fast scratch space"},
+            {type:"practice",label:"Activate the analysis environment (conda activate <env>), then run  which metaphlan  to see the tool"},
+            {type:"think",   label:"Why can't we just run this analysis on a laptop?"}
+          ],
+          mission:"Log in, activate the conda environment, and find your project folder on the server."
+        },
+        {
+          id:3, color:"orange",
+          title:"Running Jobs with SLURM",
+          pills:["SLURM","sbatch","squeue","Partitions"],
+          objectives:[
+            "Understand why a cluster needs a job scheduler (SLURM) to share resources fairly",
+            "Read the parts of an sbatch script (#SBATCH directives: partition, cpus, memory, time)",
+            "Submit a job, watch it with squeue, and read its output log"
+          ],
+          tasks:[
+            {type:"read",    label:"A scheduler (SLURM) queues everyone's jobs and runs them on free nodes, so nobody hogs the machine"},
+            {type:"read",    label:"sbatch anatomy:  #SBATCH --partition / --cpus-per-task / --mem-per-cpu / --time / --output"},
+            {type:"practice",label:"Look at a template job script with your mentor and point to each #SBATCH line"},
+            {type:"practice",label:"Submit a tiny test job with  sbatch  that prints the hostname and the date"},
+            {type:"practice",label:"Watch it with  squeue -u <you> ; when it finishes, open the .out log file"},
+            {type:"think",   label:"What could go wrong if 50 people all ran huge jobs on the login node at once?"}
+          ],
+          mission:"Submit a job that prints the compute node name and the date, then read its log file."
+        },
+        {
+          id:4, color:"coral",
+          title:"Analyze Sequences: QC + Who Is There",
+          pills:["KneadData","QC","MetaPhlAn4","Abundance"],
+          objectives:[
+            "Run KneadData to clean reads and remove human DNA",
+            "Run MetaPhlAn4 to find which species are present (taxonomic profiling)",
+            "Open and read a species abundance table"
+          ],
+          tasks:[
+            {type:"read",    label:"Step 1 KneadData: trims low-quality bases + removes human reads.  Step 2 MetaPhlAn4: identifies the species."},
+            {type:"practice",label:"Run (or submit) the KneadData step on one sample with your mentor"},
+            {type:"practice",label:"Run MetaPhlAn4 on the cleaned reads to get an abundance profile"},
+            {type:"practice",label:"Open the MetaPhlAn4 output table and find the 3 most abundant species"},
+            {type:"write",   label:"Lab notebook: write down the top 3 species and their % abundance"},
+            {type:"think",   label:"Why must we remove human DNA BEFORE profiling the bacteria?"}
+          ],
+          mission:"Produce a MetaPhlAn4 abundance table for one sample and name its 3 most abundant species."
+        },
+        {
+          id:5, color:"gold",
+          title:"Function, Merge & Present",
+          pills:["HUMAnN3","Merge Tables","Pathways","Presentation"],
+          objectives:[
+            "Run HUMAnN3 to profile what the bacteria can DO (functions / pathways)",
+            "Merge results from several samples into one table",
+            "Explain your whole pipeline run and hand off clean tables for Week 3"
+          ],
+          tasks:[
+            {type:"read",    label:"HUMAnN3 estimates metabolic pathways — e.g. the community's capacity to produce butyrate"},
+            {type:"practice",label:"Run (or submit) HUMAnN3 on the cleaned reads"},
+            {type:"practice",label:"Merge several samples into one table (e.g. merge_metaphlan_tables.py)"},
+            {type:"practice",label:"Open the merged table and find one pathway or species that differs between samples"},
+            {type:"write",   label:"Prepare a 5-min talk: each pipeline step, its input, and its output"},
+            {type:"think",   label:"Taxonomy tells you WHO is there; function tells you WHAT they do. Why do we need both?"}
+          ],
+          mission:"Present your pipeline run to your mentor — what each step did and what output it produced."
+        }
+      ]
+    },
     {id:3, title:"Week 3", subtitle:"Analysis & Results",       locked:true, days:[]}
   ],
 
@@ -436,6 +535,9 @@ const DATA = {
     {id:"bacteria",   title:"Key Bacteria",           icon:"🔬", color:"purple", questions:5},
     {id:"dna",        title:"DNA & Sequencing",       icon:"🧬", color:"green",  questions:25},
     {id:"pipeline",   title:"Metagenomics Pipeline",  icon:"⚙️", color:"orange", questions:5},
+    {id:"bash",       title:"Bash & Scripting",       icon:"⌨️", color:"green",  questions:8},
+    {id:"hpc",        title:"HPC & SLURM",            icon:"🖥️", color:"purple", questions:8},
+    {id:"analysis",   title:"Running the Pipeline",   icon:"🧪", color:"coral",  questions:8},
     {id:"open",       title:"Open Questions",         icon:"🧠", color:"gold",   questions:5, open:true}
   ],
 
